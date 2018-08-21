@@ -1,0 +1,8 @@
+{
+   "x_api_key": "x-api-key",
+   "client_id": "client_id",
+   "client_secret": "client_secret",
+   "resources": "resources",
+   "database_url": "database_url" 
+}
+
