@@ -1,6 +1,8 @@
 import React, { Component } from "react"
 
 import AppBar from "@material-ui/core/AppBar"
+import AuthorizedUser from "./AuthorizedUser"
+import LoggedOut from "./LoggedOut"
 import Toolbar from "@material-ui/core/Toolbar"
 import Typography from "@material-ui/core/Typography"
 import { withStyles } from "@material-ui/core/styles"
@@ -28,8 +30,24 @@ const styles = ({ zIndex, spacing }) => ({
 })
 
 class AppToolbar extends Component {
+  state = {
+    user: null,
+  }
+
+  componentDidMount() {
+    if (localStorage.hasOwnProperty("user")) {
+      this.setState({ user: JSON.parse(localStorage["user"]) })
+    }
+  }
+
+  _logOut = () => {
+    this.setState({ user: null })
+    localStorage.clear()
+  }
+
   render() {
-    const { classes, user } = this.props
+    const { user } = this.state
+    const { classes } = this.props
 
     return (
       <AppBar position="absolute" className={classes.appBar}>
@@ -39,26 +57,10 @@ class AppToolbar extends Component {
           </Typography>
 
           {user ? (
-            <React.Fragment>
-              <div className={classes.container}>
-                <Typography variant="subheading" color="inherit">
-                  Welcome {user.name}!
-                </Typography>
-                <Typography
-                  className={classes.logOut}
-                  variant="subheading"
-                  color="inherit"
-                >
-                  Log Out
-                </Typography>
-              </div>
-              <img
-                className={classes.avatar}
-                src={user.avatarUrl}
-                alt="avatar"
-              />
-            </React.Fragment>
-          ) : null}
+            <AuthorizedUser user={user} onLogOut={this._logOut} />
+          ) : (
+            <LoggedOut />
+          )}
         </Toolbar>
       </AppBar>
     )

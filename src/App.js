@@ -10,12 +10,10 @@ import theme from "./theme"
 
 class App extends Component {
   render() {
-    const { user } = this.props
-
     return (
       <MuiThemeProvider theme={theme}>
         <BrowserRouter>
-          <AppLayout user={user}>
+          <AppLayout>
             <Route exact path="/" component={Search} />
             <Route exact path="/search" component={Search} />
             <Route exact path="/new" component={NewReport} />

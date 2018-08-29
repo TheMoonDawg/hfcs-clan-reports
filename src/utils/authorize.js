@@ -1,25 +1,20 @@
 import React, { Component } from "react"
 
 class AuthorizedApp extends Component {
-  state = {
-    user: null,
-  }
-
   componentDidMount() {
-    this.setState({
-      user: {
-        name: "MoonDawg",
-        avatarUrl:
-          "http://www.bungie.net/img/profile/avatars/admin/MoondawgNEW_Ninja.gif",
-      },
-    })
+    const user = {
+      name: "MoonDawg",
+      avatarUrl:
+        "http://www.bungie.net/img/profile/avatars/admin/MoondawgNEW_Ninja.gif",
+    }
+
+    localStorage["user"] = JSON.stringify(user)
   }
 
   render() {
     const { App, ...props } = this.props
-    const { user } = this.state
 
-    return <App user={user} {...props} />
+    return <App {...props} />
   }
 }
 

@@ -21,11 +21,11 @@ const styles = theme => ({
 
 class AppLayout extends Component {
   render() {
-    const { classes, user, children } = this.props
+    const { classes, children } = this.props
 
     return (
       <div className={classes.root}>
-        <AppToolbar user={user} />
+        <AppToolbar />
         <AppMenu />
         <main className={classes.content}>
           <div className={classes.toolbar} />
