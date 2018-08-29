@@ -96,43 +96,15 @@ app.get("/api/login", function(request, response) {
       }
     })
     .then(checkNinja)
-    .then(console.log)
+    .then(({ accessToken, refreshToken, ...model }) => {
+      response.statusCode = 200
+      response.send(model)
+    })
     .catch(err => {
+      console.log(err)
       response.statusCode = err.statusCode || 401
       response.send("Get out of here, you're not welcome.")
     })
-
-  /*
-     // Get Bnet profile info
-    checkNinja(
-      response,
-      json.access_token,
-      json.refresh_token,
-      cookieToken,
-      function(user) {
-        const model = {
-          MembershipId: user.MembershipId,
-          UserName: user.Name,
-          CookieToken: cookieToken,
-          AvatarURL: user.Avatar_URL,
-        }
-
-        // Update tokens in database
-        updateTokens(
-          response,
-          user.Name,
-          user.MembershipId,
-          cookieToken,
-          json.access_token,
-          json.refresh_token,
-          function() {
-            response.send(model)
-          },
-        )
-      },
-    )
-  })
-  */
 })
 
 // Get Resource Links
@@ -263,7 +235,7 @@ function checkNinja({ cookieToken, accessToken, refreshToken }) {
       // Valid Access Token
       .then(response => {
         const user = JSON.parse(response).Response.bungieNetUser
-        model = generateModel(user, accessToken, refreshToken)
+        model = generateModel(user, cookieToken, accessToken, refreshToken)
       })
       // Invalid Access Token - Use Refresh Token
       .catch(() => {
@@ -286,6 +258,7 @@ function checkNinja({ cookieToken, accessToken, refreshToken }) {
 
             model = generateModel(
               user,
+              cookieToken,
               tokens.access_token,
               tokens.refresh_token,
             )
@@ -310,10 +283,11 @@ const getUser = accessToken => {
   return rp(options)
 }
 
-const generateModel = (user, accessToken, refreshToken) => ({
+const generateModel = (user, cookieToken, accessToken, refreshToken) => ({
   membershipId: user.membershipId,
   name: user.displayName,
   avatarURL: `http://www.bungie.net${user.profilePicturePath}`,
+  cookieToken,
   accessToken,
   refreshToken,
 })
