@@ -21,11 +21,11 @@ const styles = theme => ({
 
 class AppLayout extends Component {
   render() {
-    const { classes, children } = this.props
+    const { classes, user, onLogOut, children } = this.props
 
     return (
       <div className={classes.root}>
-        <AppToolbar />
+        <AppToolbar user={user} onLogOut={onLogOut} />
         <AppMenu />
         <main className={classes.content}>
           <div className={classes.toolbar} />

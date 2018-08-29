@@ -39,7 +39,7 @@ class AuthorizedUser extends Component {
               Log Out
             </Typography>
           </div>
-          <img className={classes.avatar} src={user.avatarUrl} alt="avatar" />
+          <img className={classes.avatar} src={user.avatarURL} alt="avatar" />
         </React.Fragment>
       )
     )

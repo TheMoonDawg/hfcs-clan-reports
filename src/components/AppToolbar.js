@@ -30,24 +30,8 @@ const styles = ({ zIndex, spacing }) => ({
 })
 
 class AppToolbar extends Component {
-  state = {
-    user: null,
-  }
-
-  componentDidMount() {
-    if (localStorage.hasOwnProperty("user")) {
-      this.setState({ user: JSON.parse(localStorage["user"]) })
-    }
-  }
-
-  _logOut = () => {
-    this.setState({ user: null })
-    localStorage.clear()
-  }
-
   render() {
-    const { user } = this.state
-    const { classes } = this.props
+    const { classes, user, onLogOut } = this.props
 
     return (
       <AppBar position="absolute" className={classes.appBar}>
@@ -57,7 +41,7 @@ class AppToolbar extends Component {
           </Typography>
 
           {user ? (
-            <AuthorizedUser user={user} onLogOut={this._logOut} />
+            <AuthorizedUser user={user} onLogOut={onLogOut} />
           ) : (
             <LoggedOut />
           )}
