@@ -101,7 +101,6 @@ app.get("/api/login", function(request, response) {
       response.send(model)
     })
     .catch(err => {
-      console.log(err)
       response.statusCode = err.statusCode || 401
       response.send("Get out of here, you're not welcome.")
     })
