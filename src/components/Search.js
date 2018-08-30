@@ -5,11 +5,16 @@ import Card from "@material-ui/core/Card"
 import CardActions from "@material-ui/core/CardActions"
 import CardContent from "@material-ui/core/CardContent"
 import CardHeader from "@material-ui/core/CardHeader"
+import ErrorSnackbar from "./ErrorSnackbar"
+import SearchResults from "./SearchResults"
 import TextField from "@material-ui/core/TextField"
 import getReports from "../requests/getReports"
 import { withStyles } from "@material-ui/core/styles"
 
 const styles = ({ spacing }) => ({
+  card: {
+    marginBottom: spacing.unit * 3,
+  },
   textField: {
     width: 200,
     marginBottom: spacing.unit,
@@ -30,9 +35,14 @@ class Search extends Component {
     const { user } = this.props
     getReports(user, params)
       .then(result => {
-        console.log("SUCCESS!!!", result)
+        this.setState({ results: result })
       })
-      .catch(err => console.log("NAH CUZ", err))
+      .catch(message =>
+        this.setState({
+          open: true,
+          message,
+        }),
+      )
   }
 
   onSearch = () => {
@@ -51,54 +61,67 @@ class Search extends Component {
     this.fetchReports(params)
   }
 
+  onCloseSnackbar = () => this.setState({ open: false })
+
   render() {
-    const { id, name } = this.state
+    const { id, name, results, open, message } = this.state
     const { classes, user } = this.props
 
     return (
-      <Card>
-        <CardHeader title="Search" />
-        <CardContent>
-          <TextField
-            className={classes.textField}
-            label="Clan Id:"
-            value={id}
-            onChange={this.onIdChange}
-            disabled={!user}
-          />
-          <br />
-          <TextField
-            className={classes.textField}
-            label="Clan Name:"
-            value={name}
-            onChange={this.onNameChange}
-            disabled={!user}
-          />
-        </CardContent>
-        <CardActions>
-          <Button
-            variant="raised"
-            onClick={this.onSearch}
-            disabled={!user || (!id.trim() && !name.trim())}
-          >
-            Search
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={this.onLast50Reports}
-            disabled={!user}
-          >
-            Last 50 Reports
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={this.onUserLast100Reports}
-            disabled={!user}
-          >
-            Your Last 100 Reports
-          </Button>
-        </CardActions>
-      </Card>
+      <React.Fragment>
+        <Card className={classes.card}>
+          <CardHeader title="Search" />
+          <CardContent>
+            <TextField
+              type="number"
+              className={classes.textField}
+              label="Clan Id:"
+              value={id}
+              onChange={this.onIdChange}
+              disabled={!user}
+            />
+            <br />
+            <TextField
+              className={classes.textField}
+              label="Clan Name:"
+              value={name}
+              onChange={this.onNameChange}
+              disabled={!user}
+            />
+          </CardContent>
+          <CardActions>
+            <Button
+              variant="raised"
+              onClick={this.onSearch}
+              disabled={!user || (!id.trim() && !name.trim())}
+            >
+              Search
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={this.onLast50Reports}
+              disabled={!user}
+            >
+              Last 50 Reports
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={this.onUserLast100Reports}
+              disabled={!user}
+            >
+              Your Last 100 Reports
+            </Button>
+          </CardActions>
+        </Card>
+
+        {results && <SearchResults title="Search Results" results={results} />}
+
+        <ErrorSnackbar
+          open={open}
+          message={message}
+          onClose={this.onCloseSnackbar}
+        />
+      </React.Fragment>
     )
   }
 }

@@ -138,6 +138,7 @@ app.get("/api/search", function(request, response) {
     .then(user => {
       let query = `
         SELECT  
+          r.id,
           r.report_date AS "reportDate",
           r.clan_id AS "clanId",
           r.clan_name AS "clanName",
