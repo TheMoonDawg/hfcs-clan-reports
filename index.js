@@ -74,6 +74,8 @@ const getErrorMessage = statusCode => {
   }
 }
 
+const getAuthToken = request => request.headers.authorization.substring(6)
+
 app.set("port", process.env.PORT || 5000)
 
 app.listen(app.get("port"), function() {
@@ -129,15 +131,10 @@ app.get("/api/login", function(request, response) {
 // Search Clan Reports
 app.get("/api/search", function(request, response) {
   const queryString = request.query
+  const token = getAuthToken(request)
 
-  getAccessTokens(queryString.cookie_token)
-    .then(data =>
-      checkNinja(
-        queryString.cookie_token,
-        data.access_token,
-        data.refresh_token,
-      ),
-    )
+  getAccessTokens(token)
+    .then(data => checkNinja(token, data.access_token, data.refresh_token))
     .then(user => {
       let query = `
         SELECT  
@@ -198,16 +195,10 @@ app.get("/api/search", function(request, response) {
 
 // New Clan Report
 app.post("/api/new", function(request, response) {
-  const queryString = request.query
+  const token = getAuthToken(request)
 
-  getAccessTokens(queryString.cookie_token)
-    .then(data =>
-      checkNinja(
-        queryString.cookie_token,
-        data.access_token,
-        data.refresh_token,
-      ),
-    )
+  getAccessTokens(token)
+    .then(data => checkNinja(token, data.access_token, data.refresh_token))
     .then(user => {
       let jsonString = ""
 

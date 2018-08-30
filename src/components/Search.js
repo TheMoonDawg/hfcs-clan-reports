@@ -6,7 +6,7 @@ import CardActions from "@material-ui/core/CardActions"
 import CardContent from "@material-ui/core/CardContent"
 import CardHeader from "@material-ui/core/CardHeader"
 import TextField from "@material-ui/core/TextField"
-import queryString from "query-string"
+import getReports from "../requests/getReports"
 import { withStyles } from "@material-ui/core/styles"
 
 const styles = ({ spacing }) => ({
@@ -26,23 +26,29 @@ class Search extends Component {
   onIdChange = this.onChange("id")
   onNameChange = this.onChange("name")
 
-  onSearch = () => {
-    const { id, name } = this.state
-    const {
-      user: { cookieToken },
-    } = this.props
-    const params = { cookie_token: cookieToken, clan_id: id, clan_name: name }
-
-    fetch(`../api/search?${queryString.stringify(params)}`)
-      .then(result => {
-        console.log(result)
-        if (result.status === 200) return result.json()
-        else throw result.statusText
-      })
+  fetchReports = params => {
+    const { user } = this.props
+    getReports(user, params)
       .then(result => {
         console.log("SUCCESS!!!", result)
       })
       .catch(err => console.log("NAH CUZ", err))
+  }
+
+  onSearch = () => {
+    const { id, name } = this.state
+    const params = { clan_id: id, clan_name: name }
+    this.fetchReports(params)
+  }
+
+  onLast50Reports = () => {
+    const params = { last_50_reports: true }
+    this.fetchReports(params)
+  }
+
+  onUserLast100Reports = () => {
+    const params = { user_100_reports: true }
+    this.fetchReports(params)
   }
 
   render() {
@@ -73,10 +79,18 @@ class Search extends Component {
           <Button variant="raised" onClick={this.onSearch} disabled={!user}>
             Search
           </Button>
-          <Button variant="outlined" disabled={!user}>
+          <Button
+            variant="outlined"
+            onClick={this.onLast50Reports}
+            disabled={!user}
+          >
             Last 50 Reports
           </Button>
-          <Button variant="outlined" disabled={!user}>
+          <Button
+            variant="outlined"
+            onClick={this.onUserLast100Reports}
+            disabled={!user}
+          >
             Your Last 100 Reports
           </Button>
         </CardActions>
