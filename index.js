@@ -138,7 +138,20 @@ app.get("/api/search", function(request, response) {
       ),
     )
     .then(user => {
-      let query = "SELECT * FROM report WHERE 1=1"
+      let query = `
+        SELECT  
+          r.report_date AS "reportDate",
+          r.clan_id AS "clanId",
+          r.clan_name AS "clanName",
+          r.clan_motto AS "clanMotto",
+          r.clan_mission_statement AS "clanMissionStatement",
+          r.notes,
+          n.display_name AS ninja,
+          r.judgment
+        FROM report r 
+        JOIN ninja n ON n.ninja_id = r.ninja_id 
+        WHERE 1=1
+        `
       let paramNum = 1
       let values = []
 
@@ -281,9 +294,10 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
       })
       // Check Authorized Ninja
       .then(() =>
-        executeQuery("SELECT display_name FROM ninja WHERE ninja_id = $1", [
-          model.membershipId,
-        ]),
+        executeQuery(
+          "SELECT display_name FROM ninja WHERE ninja_id = $1 AND active",
+          [model.membershipId],
+        ),
       )
       .then(result => {
         if (result.length == 0) throw UNAUTHORIZED

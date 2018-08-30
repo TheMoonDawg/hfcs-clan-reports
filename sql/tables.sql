@@ -1,7 +1,8 @@
 CREATE TABLE ninja
 (
     ninja_id INTEGER PRIMARY KEY,
-    display_name TEXT NOT NULL
+    display_name TEXT NOT NULL,
+    active BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE report
