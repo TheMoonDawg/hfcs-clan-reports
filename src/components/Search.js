@@ -31,11 +31,14 @@ class Search extends Component {
     const {
       user: { cookieToken },
     } = this.props
-    console.log("bloop", cookieToken)
-
     const params = { cookie_token: cookieToken, clan_id: id, clan_name: name }
+
     fetch(`../api/search?${queryString.stringify(params)}`)
-      .then(result => result.json())
+      .then(result => {
+        console.log(result)
+        if (result.status === 200) return result.json()
+        else throw result.statusText
+      })
       .then(result => {
         console.log("SUCCESS!!!", result)
       })

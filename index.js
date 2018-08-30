@@ -120,8 +120,9 @@ app.get("/api/login", function(request, response) {
       response.send(model)
     })
     .catch(statusCode => {
-      response.statusCode = statusCode || SERVER_ERROR
-      response.send(getErrorMessage(statusCode))
+      response.statusCode = statusCode
+      response.statusMessage = getErrorMessage(statusCode)
+      response.end()
     })
 })
 
@@ -190,7 +191,8 @@ app.get("/api/search", function(request, response) {
     })
     .catch(statusCode => {
       response.statusCode = statusCode
-      response.send(getErrorMessage(statusCode))
+      response.statusMessage = getErrorMessage(statusCode)
+      response.end()
     })
 })
 
@@ -237,7 +239,8 @@ app.post("/api/new", function(request, response) {
     })
     .catch(statusCode => {
       response.statusCode = statusCode
-      response.send(getErrorMessage(statusCode))
+      response.statusMessage = getErrorMessage(statusCode)
+      response.end()
     })
 })
 
