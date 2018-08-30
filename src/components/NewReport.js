@@ -80,11 +80,12 @@ class NewReport extends Component {
       parserClanId,
       parserQueue,
     } = this.state
-    const { classes } = this.props
+    const { classes, user } = this.props
+    const userName = user ? user.name : null
 
     return (
       <Card>
-        <CardHeader title="NINJA NAME" />
+        <CardHeader title={userName} />
         <CardContent>
           <div className={classes.container}>
             <div>
@@ -94,6 +95,7 @@ class NewReport extends Component {
                 label="Judgment:"
                 value={judgment}
                 onChange={this.onJudgmentChange}
+                disabled={!user}
               >
                 <MenuItem value="Warning">Warning</MenuItem>
                 <MenuItem value="7 Day Ban">7 Day Ban</MenuItem>
@@ -109,6 +111,7 @@ class NewReport extends Component {
                 label="Clan Id:"
                 value={id}
                 onChange={this.onIdChange}
+                disabled={!user}
               />
 
               <br />
@@ -119,6 +122,7 @@ class NewReport extends Component {
                 label="Clan Name:"
                 value={name}
                 onChange={this.onNameChange}
+                disabled={!user}
               />
 
               <br />
@@ -129,6 +133,7 @@ class NewReport extends Component {
                 label="Clan Motto:"
                 value={motto}
                 onChange={this.onMottoChange}
+                disabled={!user}
               />
 
               <br />
@@ -144,6 +149,7 @@ class NewReport extends Component {
                   label="Clan Mission Statement:"
                   value={missionStatement}
                   onChange={this.onMissionStatementChange}
+                  disabled={!user}
                 />
               </div>
 
@@ -156,6 +162,7 @@ class NewReport extends Component {
                   label="Notes:"
                   value={notes}
                   onChange={this.onNotesChange}
+                  disabled={!user}
                 />
               </div>
             </div>
@@ -168,6 +175,7 @@ class NewReport extends Component {
               <TextField
                 className={classnames(classes.margin, classes.textFieldParser)}
                 label="Parser (Clan Id):"
+                disabled={!user}
               />
 
               <br />
@@ -182,13 +190,16 @@ class NewReport extends Component {
                   InputLabelProps={{
                     shrink: true,
                   }}
+                  disabled={!user}
                 />
               </div>
             </div>
           </div>
         </CardContent>
         <CardActions>
-          <Button variant="raised">Create Report</Button>
+          <Button variant="raised" disabled={!user}>
+            Create Report
+          </Button>
         </CardActions>
       </Card>
     )

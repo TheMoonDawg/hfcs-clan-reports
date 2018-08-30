@@ -1,7 +1,6 @@
 // Imports
 const express = require("express")
-const httpRequest = require("request")
-const rp = require("request-promise")
+const requestPromise = require("request-promise")
 const path = require("path")
 const csParse = require("pg-connection-string").parse
 const { Pool } = require("pg")
@@ -61,6 +60,20 @@ const getUserRequestOptions = accessToken => ({
   },
 })
 
+const OK = 200
+const UNAUTHORIZED = 401
+const SERVER_ERROR = 500
+
+const getErrorMessage = statusCode => {
+  switch (statusCode) {
+    case 401:
+      return "Hey, you're not allowed to be here. Shoo!"
+    case 500:
+    default:
+      return "An internal server error has occurred... yell at MoonDawg to fix it."
+  }
+}
+
 app.set("port", process.env.PORT || 5000)
 
 app.listen(app.get("port"), function() {
@@ -86,147 +99,136 @@ app.get("/api/login", function(request, response) {
   const options = getAuthorizationRequestOptions(request.query.code)
   const cookieToken = uuidv4()
 
-  rp(options)
+  requestPromise(options)
+    .catch(({ statusCode }) => {
+      throw statusCode
+    })
     .then(response => {
       const json = JSON.parse(response)
-      return {
-        cookieToken,
-        accessToken: json.access_token,
-        refreshToken: json.refresh_token,
-      }
+      return checkNinja(cookieToken, json.access_token, json.refresh_token)
     })
-    .then(checkNinja)
-    .then(({ accessToken, refreshToken, ...model }) => {
-      response.statusCode = 200
+    .then(({ accessToken, refreshToken, ...model }) =>
+      updateTokens(
+        model.membershipId,
+        model.cookieToken,
+        accessToken,
+        refreshToken,
+      ).then(() => model),
+    )
+    .then(model => {
+      response.statusCode = OK
       response.send(model)
     })
-    .catch(err => {
-      response.statusCode = err.statusCode || 401
-      response.send("Get out of here, you're not welcome.")
+    .catch(statusCode => {
+      response.statusCode = statusCode || SERVER_ERROR
+      response.send(getErrorMessage(statusCode))
     })
-})
-
-// Get Resource Links
-app.get("/api/resources", function(request, response) {
-  const queryString = request.query
-
-  getAccessTokens(response, queryString.CookieToken, function(data) {
-    checkNinja(
-      response,
-      data.accesstoken,
-      data.refreshtoken,
-      queryString.CookieToken,
-      function() {
-        if (response.statusCode === 401) return
-
-        response.statusCode = 200
-        response.send({ Resources: resources })
-      },
-    )
-  })
 })
 
 // Search Clan Reports
 app.get("/api/search", function(request, response) {
   const queryString = request.query
 
-  getAccessTokens(response, queryString.CookieToken, function(data) {
-    checkNinja(
-      response,
-      data.accesstoken,
-      data.refreshtoken,
-      queryString.CookieToken,
-      function(user) {
-        if (response.statusCode === 401) return
-
-        // Form query
-        let query = "SELECT * FROM report WHERE 1=1"
-        let paramNum = 1
-        let values = []
-
-        if (queryString.ClanId && queryString.ClanId != "undefined") {
-          query += " AND clan_id=$" + paramNum
-          paramNum++
-          values.push(queryString.ClanId)
-        }
-
-        if (queryString.ClanName && queryString.ClanName != "undefined") {
-          query += " AND clan_name ~* $" + paramNum
-          paramNum++
-          values.push(queryString.ClanName.toUpperCase() + "%")
-        }
-
-        if (queryString.User100Reports) {
-          query += " AND ninja_id=$" + paramNum
-          paramNum++
-          values.push(user.MembershipId)
-        }
-
-        query += " ORDER BY report_date DESC"
-
-        if (queryString.Last50Reports) {
-          query += " LIMIT 50"
-        }
-
-        if (queryString.User100Reports) {
-          query += " LIMIT 100"
-        }
-
-        executeQuery(response, query, values, function(data) {
-          response.statusCode = 200
-          response.send(data)
-        })
-      },
+  getAccessTokens(queryString.cookie_token)
+    .then(data =>
+      checkNinja(
+        queryString.cookie_token,
+        data.access_token,
+        data.refresh_token,
+      ),
     )
-  })
+    .then(user => {
+      let query = "SELECT * FROM report WHERE 1=1"
+      let paramNum = 1
+      let values = []
+
+      if (queryString.clan_id) {
+        query += ` AND clan_id=$${paramNum}`
+        paramNum++
+        values.push(queryString.clan_id)
+      }
+
+      if (queryString.clan_name) {
+        query += ` AND clan_name ~* $${paramNum}`
+        paramNum++
+        values.push(queryString.clan_name)
+      }
+
+      if (queryString.user_100_reports) {
+        query += ` AND ninja_id=$${paramNum}`
+        paramNum++
+        values.push(user.membershipId)
+      }
+
+      query += " ORDER BY report_date DESC"
+
+      if (queryString.last_50_reports) {
+        query += " LIMIT 50"
+      }
+
+      if (queryString.user_100_reports) {
+        query += " LIMIT 100"
+      }
+
+      executeQuery(query, values).then(data => {
+        response.statusCode = OK
+        response.send(data)
+      })
+    })
+    .catch(statusCode => {
+      response.statusCode = statusCode
+      response.send(getErrorMessage(statusCode))
+    })
 })
 
 // New Clan Report
 app.post("/api/new", function(request, response) {
   const queryString = request.query
 
-  getAccessTokens(response, queryString.CookieToken, function(data) {
-    checkNinja(
-      response,
-      data.accesstoken,
-      data.refreshtoken,
-      queryString.CookieToken,
-      function() {
-        if (response.statusCode === 401) return
-
-        let jsonString = ""
-
-        request.on("data", function(data) {
-          jsonString += data
-        })
-
-        request.on("end", function() {
-          const data = JSON.parse(jsonString)
-
-          // Form query
-          const query =
-            "INSERT INTO report(clan_id, clan_name, clan_motto, clan_mission_statement, notes, ninja_id, judgment, report_date) Values($1, $2, $3, $4, $5, $6, $7, NOW());"
-          const params = [
-            data.ClanId,
-            data.ClanName,
-            data.ClanMotto,
-            data.ClanMissionStatement,
-            data.Notes,
-            data.Ninja,
-            data.Judgment,
-          ]
-
-          executeQuery(response, query, params, function() {
-            response.statusCode = 200
-            response.send()
-          })
-        })
-      },
+  getAccessTokens(queryString.cookie_token)
+    .then(data =>
+      checkNinja(
+        queryString.cookie_token,
+        data.access_token,
+        data.refresh_token,
+      ),
     )
-  })
+    .then(user => {
+      let jsonString = ""
+
+      request.on("data", function(data) {
+        jsonString += data
+      })
+
+      request.on("end", function() {
+        const data = JSON.parse(jsonString)
+
+        // Form query
+        const query =
+          "INSERT INTO report(clan_id, clan_name, clan_motto, clan_mission_statement, notes, ninja_id, judgment, report_date) Values($1, $2, $3, $4, $5, $6, $7, NOW());"
+        const params = [
+          data.clanId,
+          data.clanName,
+          data.clanMotto,
+          data.clanMissionStatement,
+          data.notes,
+          user.membershipId,
+          data.judgment,
+        ]
+
+        executeQuery(query, params).then(() => {
+          response.statusCode = OK
+          response.send()
+        })
+      })
+    })
+    .catch(statusCode => {
+      response.statusCode = statusCode
+      response.send(getErrorMessage(statusCode))
+    })
 })
 
-function checkNinja({ cookieToken, accessToken, refreshToken }) {
+const checkNinja = (cookieToken, accessToken, refreshToken) => {
   let model
 
   return (
@@ -240,29 +242,42 @@ function checkNinja({ cookieToken, accessToken, refreshToken }) {
       .catch(() => {
         const options = getRefreshRequestOptions(refreshToken)
 
-        return rp(options).then(response => {
-          const tokens = JSON.parse(response)
+        return (
+          requestPromise(options)
+            // Invalid Refresh Token
+            .catch(({ statusCode }) => {
+              throw statusCode
+            })
+            .then(response => {
+              const tokens = JSON.parse(response)
 
-          return getUser(tokens.access_token).then(response => {
-            const user = JSON.parse(response).Response.bungieNetUser
-            console.log(user)
+              return (
+                getUser(tokens.access_token)
+                  // New Access Token also invalid
+                  .catch(({ statusCode }) => {
+                    throw statusCode
+                  })
+                  .then(response => {
+                    const user = JSON.parse(response).Response.bungieNetUser
 
-            // Update tokens in DB
-            updateTokens(
-              user.membershipId,
-              cookieToken,
-              tokens.access_token,
-              tokens.refresh_token,
-            )
-
-            model = generateModel(
-              user,
-              cookieToken,
-              tokens.access_token,
-              tokens.refresh_token,
-            )
-          })
-        })
+                    // Update tokens in DB
+                    return updateTokens(
+                      user.membershipId,
+                      cookieToken,
+                      tokens.access_token,
+                      tokens.refresh_token,
+                    ).then(() => {
+                      model = generateModel(
+                        user,
+                        cookieToken,
+                        tokens.access_token,
+                        tokens.refresh_token,
+                      )
+                    })
+                  })
+              )
+            })
+        )
       })
       // Check Authorized Ninja
       .then(() =>
@@ -271,7 +286,7 @@ function checkNinja({ cookieToken, accessToken, refreshToken }) {
         ]),
       )
       .then(result => {
-        if (result.length == 0) throw new Error("Unauthorized")
+        if (result.length == 0) throw UNAUTHORIZED
       })
       .then(() => model)
   )
@@ -279,19 +294,33 @@ function checkNinja({ cookieToken, accessToken, refreshToken }) {
 
 const getUser = accessToken => {
   const options = getUserRequestOptions(accessToken)
-  return rp(options)
+  return requestPromise(options)
 }
 
 const generateModel = (user, cookieToken, accessToken, refreshToken) => ({
   membershipId: user.membershipId,
   name: user.displayName,
   avatarURL: `http://www.bungie.net${user.profilePicturePath}`,
+  resources,
   cookieToken,
   accessToken,
   refreshToken,
 })
 
-const updateTokens = (membershipId, cookieToken, accessToken, refreshToken) => {
+const getAccessTokens = cookieToken =>
+  executeQuery("SELECT * FROM token WHERE cookie_token=$1;", [
+    cookieToken,
+  ]).then(data => {
+    if (!data || data.length === 0) {
+      throw UNAUTHORIZED
+    } else if (data.length > 1) {
+      throw SERVER_ERROR
+    }
+
+    return data[0]
+  })
+
+const updateTokens = (membershipId, cookieToken, accessToken, refreshToken) =>
   executeQuery("SELECT ninja_id FROM token WHERE ninja_id=$1", [
     membershipId,
   ]).then(result => {
@@ -312,7 +341,6 @@ const updateTokens = (membershipId, cookieToken, accessToken, refreshToken) => {
 
     executeQuery(query, params)
   })
-}
 
 const executeQuery = (query, params) => {
   const pool = new Pool()
@@ -322,6 +350,6 @@ const executeQuery = (query, params) => {
     .then(res => res.rows)
     .catch(err => {
       console.log(err)
-      throw err
+      throw SERVER_ERROR
     })
 }

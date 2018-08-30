@@ -9,17 +9,18 @@ import List from "@material-ui/core/List"
 import ListItem from "@material-ui/core/ListItem"
 import ListItemIcon from "@material-ui/core/ListItemIcon"
 import ListItemText from "@material-ui/core/ListItemText"
+import Typography from "@material-ui/core/Typography"
 import background from "../images/background.jpg"
 import { withStyles } from "@material-ui/core/styles"
 
 const drawerWidth = 240
 
-const styles = theme => ({
+const styles = ({ mixins, spacing, palette }) => ({
   drawerPaper: {
     position: "relative",
     width: drawerWidth,
   },
-  toolbar: theme.mixins.toolbar,
+  toolbar: mixins.toolbar,
   link: {
     textDecoration: "none",
     color: "inherit",
@@ -28,6 +29,20 @@ const styles = theme => ({
     display: "flex",
     flexDirection: "column",
     height: "100%",
+  },
+  resourcesLabel: {
+    marginLeft: spacing.unit,
+    marginBottom: spacing.unit * 3,
+  },
+  resourcesContainer: {
+    marginLeft: spacing.unit,
+
+    "& > a": {
+      display: "block",
+      color: palette.common.white,
+      textDecoration: "none",
+      marginBottom: spacing.unit,
+    },
   },
   flex: {
     flex: 1,
@@ -43,7 +58,8 @@ class AppMenu extends Component {
 
   render() {
     const { renderImage } = this.state
-    const { classes } = this.props
+    const { classes, user } = this.props
+    const resources = user ? { __html: user.resources } : null
 
     return (
       <Drawer
@@ -74,6 +90,16 @@ class AppMenu extends Component {
         <Divider />
         <List />
         <div className={classes.container}>
+          {user && (
+            <Typography variant="headline" className={classes.resourcesLabel}>
+              Resources
+            </Typography>
+          )}
+          <div
+            className={classes.resourcesContainer}
+            dangerouslySetInnerHTML={resources}
+          />
+
           <span className={classes.flex} />
 
           <Fade in={renderImage} timeout={{ enter: 2000 }}>

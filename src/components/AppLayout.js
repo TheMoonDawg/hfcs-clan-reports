@@ -26,7 +26,7 @@ class AppLayout extends Component {
     return (
       <div className={classes.root}>
         <AppToolbar user={user} onLogOut={onLogOut} />
-        <AppMenu />
+        <AppMenu user={user} />
         <main className={classes.content}>
           <div className={classes.toolbar} />
           {children}

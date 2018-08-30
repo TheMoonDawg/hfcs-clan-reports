@@ -2,18 +2,17 @@ import React, { Component } from "react"
 
 import { Redirect as RouterRedirect } from "react-router-dom"
 import Typography from "@material-ui/core/Typography"
-import queryString from "stringquery"
+import queryString from "query-string"
 
 class Redirect extends Component {
   componentDidMount() {
-    const { onSetUser } = this.props
-    const { code } = queryString(this.props.location.search)
+    const { code } = queryString.parse(this.props.location.search)
 
     if (code && !localStorage.hasOwnProperty("user")) {
       fetch(`../api/login?code=${code}`)
         .then(result => result.json())
         .then(result => {
-          onSetUser(result)
+          this.props.onSetUser(result)
         })
     }
   }
@@ -22,9 +21,9 @@ class Redirect extends Component {
     const { user } = this.props
 
     return user ? (
-      <RouterRedirect to="/" />
+      <RouterRedirect to="/search" />
     ) : (
-      <Typography variant="title">Loading...</Typography>
+      <Typography variant="title">Logging In...</Typography>
     )
   }
 }

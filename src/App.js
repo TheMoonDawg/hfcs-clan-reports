@@ -1,4 +1,8 @@
-import { BrowserRouter, Route } from "react-router-dom"
+import {
+  BrowserRouter,
+  Route,
+  Redirect as RouterRedirect,
+} from "react-router-dom"
 import React, { Component } from "react"
 
 import AppLayout from "./components/AppLayout"
@@ -29,6 +33,12 @@ class App extends Component {
     this.setState({ user: null })
   }
 
+  indexComponent = () => <RouterRedirect to="/search" />
+
+  searchComponent = props => <Search user={this.state.user} {...props} />
+
+  newReportComponent = props => <NewReport user={this.state.user} {...props} />
+
   redirectComponent = props => (
     <Redirect user={this.state.user} onSetUser={this.onSetUser} {...props} />
   )
@@ -40,9 +50,9 @@ class App extends Component {
       <MuiThemeProvider theme={theme}>
         <BrowserRouter>
           <AppLayout user={user} onLogOut={this.onLogOut}>
-            <Route exact path="/" component={Search} />
-            <Route exact path="/search" component={Search} />
-            <Route exact path="/new" component={NewReport} />
+            <Route exact path="/" component={this.indexComponent} />
+            <Route exact path="/search" component={this.searchComponent} />
+            <Route exact path="/new" component={this.newReportComponent} />
             <Route exact path="/redirect" component={this.redirectComponent} />
           </AppLayout>
         </BrowserRouter>

@@ -6,6 +6,7 @@ import CardActions from "@material-ui/core/CardActions"
 import CardContent from "@material-ui/core/CardContent"
 import CardHeader from "@material-ui/core/CardHeader"
 import TextField from "@material-ui/core/TextField"
+import queryString from "query-string"
 import { withStyles } from "@material-ui/core/styles"
 
 const styles = ({ spacing }) => ({
@@ -25,9 +26,25 @@ class Search extends Component {
   onIdChange = this.onChange("id")
   onNameChange = this.onChange("name")
 
+  onSearch = () => {
+    const { id, name } = this.state
+    const {
+      user: { cookieToken },
+    } = this.props
+    console.log("bloop", cookieToken)
+
+    const params = { cookie_token: cookieToken, clan_id: id, clan_name: name }
+    fetch(`../api/search?${queryString.stringify(params)}`)
+      .then(result => result.json())
+      .then(result => {
+        console.log("SUCCESS!!!", result)
+      })
+      .catch(err => console.log("NAH CUZ", err))
+  }
+
   render() {
     const { id, name } = this.state
-    const { classes } = this.props
+    const { classes, user } = this.props
 
     return (
       <Card>
@@ -38,6 +55,7 @@ class Search extends Component {
             label="Clan Id:"
             value={id}
             onChange={this.onIdChange}
+            disabled={!user}
           />
           <br />
           <TextField
@@ -45,12 +63,19 @@ class Search extends Component {
             label="Clan Name:"
             value={name}
             onChange={this.onNameChange}
+            disabled={!user}
           />
         </CardContent>
         <CardActions>
-          <Button variant="raised">Search</Button>
-          <Button variant="outlined">Last 50 Reports</Button>
-          <Button variant="outlined">Your Last 100 Reports</Button>
+          <Button variant="raised" onClick={this.onSearch} disabled={!user}>
+            Search
+          </Button>
+          <Button variant="outlined" disabled={!user}>
+            Last 50 Reports
+          </Button>
+          <Button variant="outlined" disabled={!user}>
+            Your Last 100 Reports
+          </Button>
         </CardActions>
       </Card>
     )
