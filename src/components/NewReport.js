@@ -5,9 +5,12 @@ import Card from "@material-ui/core/Card"
 import CardActions from "@material-ui/core/CardActions"
 import CardContent from "@material-ui/core/CardContent"
 import CardHeader from "@material-ui/core/CardHeader"
+import Icon from "@material-ui/core/Icon"
+import IconButton from "@material-ui/core/IconButton"
 import MenuItem from "@material-ui/core/MenuItem"
 import TextField from "@material-ui/core/TextField"
 import classnames from "classnames"
+import createReport from "../requests/createReport"
 import { withStyles } from "@material-ui/core/styles"
 
 const placeholderText =
@@ -43,6 +46,14 @@ const styles = ({ spacing, palette }) => ({
   textFieldParser: {
     width: "100%",
   },
+  parserClanIdContainer: {
+    display: "flex",
+    alignItems: "center",
+  },
+  iconButton: {
+    width: spacing.unit * 4,
+    height: spacing.unit * 4,
+  },
 })
 
 const initState = {
@@ -54,6 +65,7 @@ const initState = {
   notes: "",
   parserClanId: "",
   parserQueue: "",
+  required: false,
 }
 
 class NewReport extends Component {
@@ -69,6 +81,18 @@ class NewReport extends Component {
   onMissionStatementChange = this.onChange("missionStatement")
   onNotesChange = this.onChange("notes")
 
+  onCreateReport = () => {
+    const { id, name } = this.state
+
+    if (!id.trim() || !name.trim()) {
+      this.setState({ required: true })
+      return
+    }
+
+    alert("u gud")
+    this.setState({ required: false })
+  }
+
   render() {
     const {
       judgment,
@@ -79,6 +103,7 @@ class NewReport extends Component {
       notes,
       parserClanId,
       parserQueue,
+      required,
     } = this.state
     const { classes, user } = this.props
     const userName = user ? user.name : null
@@ -107,10 +132,13 @@ class NewReport extends Component {
 
               {/* Clan Id */}
               <TextField
+                type="number"
                 className={classnames(classes.margin, classes.textField200)}
                 label="Clan Id:"
                 value={id}
                 onChange={this.onIdChange}
+                required={required}
+                error={required}
                 disabled={!user}
               />
 
@@ -122,6 +150,8 @@ class NewReport extends Component {
                 label="Clan Name:"
                 value={name}
                 onChange={this.onNameChange}
+                required={required}
+                error={required}
                 disabled={!user}
               />
 
@@ -172,11 +202,20 @@ class NewReport extends Component {
             {/* Parsers */}
             <div className={classes.parserContainer}>
               {/* Clan Id Parser */}
-              <TextField
-                className={classnames(classes.margin, classes.textFieldParser)}
-                label="Parser (Clan Id):"
-                disabled={!user}
-              />
+              <div className={classes.parserClanIdContainer}>
+                <TextField
+                  className={classnames(
+                    classes.margin,
+                    classes.textFieldParser,
+                  )}
+                  label="Parser (Clan Id):"
+                  disabled={!user}
+                />
+
+                <IconButton className={classes.iconButton} disabled={!user}>
+                  <Icon>search</Icon>
+                </IconButton>
+              </div>
 
               <br />
 
@@ -197,7 +236,11 @@ class NewReport extends Component {
           </div>
         </CardContent>
         <CardActions>
-          <Button variant="raised" disabled={!user}>
+          <Button
+            variant="raised"
+            onClick={this.onCreateReport}
+            disabled={!user}
+          >
             Create Report
           </Button>
         </CardActions>

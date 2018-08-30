@@ -154,24 +154,24 @@ app.get("/api/search", function(request, response) {
       let values = []
 
       if (queryString.clan_id) {
-        query += ` AND clan_id=$${paramNum}`
+        query += ` AND r.clan_id=$${paramNum}`
         paramNum++
         values.push(queryString.clan_id)
       }
 
       if (queryString.clan_name) {
-        query += ` AND clan_name ~* $${paramNum}`
+        query += ` AND r.clan_name ~* $${paramNum}`
         paramNum++
         values.push(queryString.clan_name)
       }
 
       if (queryString.user_100_reports) {
-        query += ` AND ninja_id=$${paramNum}`
+        query += ` AND r.ninja_id=$${paramNum}`
         paramNum++
         values.push(user.membershipId)
       }
 
-      query += " ORDER BY report_date DESC"
+      query += " ORDER BY r.report_date DESC"
 
       if (queryString.last_50_reports) {
         query += " LIMIT 50"
@@ -181,10 +181,11 @@ app.get("/api/search", function(request, response) {
         query += " LIMIT 100"
       }
 
-      executeQuery(query, values).then(data => {
-        response.statusCode = OK
-        response.send(data)
-      })
+      return executeQuery(query, values)
+    })
+    .then(data => {
+      response.statusCode = OK
+      response.send(data)
     })
     .catch(statusCode => {
       response.statusCode = statusCode
@@ -222,11 +223,12 @@ app.post("/api/new", function(request, response) {
           data.judgment,
         ]
 
-        executeQuery(query, params).then(() => {
-          response.statusCode = OK
-          response.send()
-        })
+        return executeQuery(query, params)
       })
+    })
+    .then(() => {
+      response.statusCode = OK
+      response.send()
     })
     .catch(statusCode => {
       response.statusCode = statusCode

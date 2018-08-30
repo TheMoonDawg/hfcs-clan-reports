@@ -37,7 +37,7 @@ class Search extends Component {
 
   onSearch = () => {
     const { id, name } = this.state
-    const params = { clan_id: id, clan_name: name }
+    const params = { clan_id: id.trim(), clan_name: name.trim() }
     this.fetchReports(params)
   }
 
@@ -76,7 +76,11 @@ class Search extends Component {
           />
         </CardContent>
         <CardActions>
-          <Button variant="raised" onClick={this.onSearch} disabled={!user}>
+          <Button
+            variant="raised"
+            onClick={this.onSearch}
+            disabled={!user || (!id.trim() && !name.trim())}
+          >
             Search
           </Button>
           <Button
