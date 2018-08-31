@@ -48,35 +48,32 @@ class SearchResults extends Component {
               </TableRow>
             </TableHead>
             <TableBody>
-              {results.map(
-                row =>
-                  console.log(row) || (
-                    <TableRow key={row.id}>
-                      <TableCell padding="dense">
-                        {moment(row.reportDate).format("MM/DD/YYYY HH:MM A")}
-                      </TableCell>
-                      <TableCell padding="dense">{row.clanName}</TableCell>
-                      <TableCell padding="dense">{row.clanMotto}</TableCell>
-                      <TableCell padding="dense">
-                        {row.clanMissionStatement}
-                      </TableCell>
-                      <TableCell padding="dense">{row.ninja}</TableCell>
-                      <TableCell padding="dense">{row.judgment}</TableCell>
-                      <TableCell padding="dense">{row.notes}</TableCell>
-                      <TableCell padding="dense">
-                        <a
-                          className={classes.link}
-                          href={generateLink(row.clanId)}
-                          target="_blank"
-                        >
-                          <IconButton className={classes.iconButton}>
-                            <Icon>open_in_new</Icon>
-                          </IconButton>
-                        </a>
-                      </TableCell>
-                    </TableRow>
-                  ),
-              )}
+              {results.map(row => (
+                <TableRow key={row.id}>
+                  <TableCell padding="dense">
+                    {moment(row.reportDate).format("MM/DD/YYYY HH:MM A")}
+                  </TableCell>
+                  <TableCell padding="dense">{row.clanName}</TableCell>
+                  <TableCell padding="dense">{row.clanMotto}</TableCell>
+                  <TableCell padding="dense">
+                    {row.clanMissionStatement}
+                  </TableCell>
+                  <TableCell padding="dense">{row.ninja}</TableCell>
+                  <TableCell padding="dense">{row.judgment}</TableCell>
+                  <TableCell padding="dense">{row.notes}</TableCell>
+                  <TableCell padding="dense">
+                    <a
+                      className={classes.link}
+                      href={generateLink(row.clanId)}
+                      target="_blank"
+                    >
+                      <IconButton className={classes.iconButton}>
+                        <Icon>open_in_new</Icon>
+                      </IconButton>
+                    </a>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </CardContent>

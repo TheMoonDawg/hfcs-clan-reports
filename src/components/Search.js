@@ -92,6 +92,7 @@ class Search extends Component {
           <CardActions>
             <Button
               variant="raised"
+              color="primary"
               onClick={this.onSearch}
               disabled={!user || (!id.trim() && !name.trim())}
             >

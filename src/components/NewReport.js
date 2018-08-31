@@ -16,6 +16,11 @@ import { withStyles } from "@material-ui/core/styles"
 const placeholderText =
   "Ex:\nClan Reported:\nCLAN NAME (id: 123456)\n\nClan Motto:\nCLAN MOTTO\n\nClan Mission Statement:\nCLAN MISSION STATEMENT"
 
+const parseText = (report, regex) => {
+  const value = regex.exec(report)
+  return value ? value[1] : ""
+}
+
 const styles = ({ spacing, palette }) => ({
   container: {
     display: "flex",
@@ -64,7 +69,7 @@ const initState = {
   missionStatement: "",
   notes: "",
   parserClanId: "",
-  parserQueue: "",
+  parserQueue: placeholderText,
   required: false,
 }
 
@@ -80,6 +85,28 @@ class NewReport extends Component {
   onMottoChange = this.onChange("motto")
   onMissionStatementChange = this.onChange("missionStatement")
   onNotesChange = this.onChange("notes")
+
+  onFocus = () => this.setState({ parserQueue: "" })
+  onBlur = () => this.setState({ parserQueue: placeholderText })
+  onParse = e => {
+    const report = e.target.value.split(" \n").join("\n")
+
+    // RegEx for matching
+    const idMatch = /[\s\S]*\(id: (.*)\)/
+    const nameMatch = /[\s\S]*Clan Reported:[\s\S](.*)\(id:/
+    const mottoMatch = /[\s\S]*Clan Motto:[\s\S](.*)/
+    const statementMatch = /[\s\S]*Clan Mission Statement:[\s\S]([\s\S]*.*)/
+
+    this.setState({
+      ...initState,
+      id: parseText(report, idMatch),
+      name: parseText(report, nameMatch),
+      motto: parseText(report, mottoMatch),
+      missionStatement: parseText(report, statementMatch),
+    })
+
+    this.inputRef.blur()
+  }
 
   onCreateReport = () => {
     const { id, name } = this.state
@@ -223,13 +250,18 @@ class NewReport extends Component {
               <div className={classes.textBoxContainer}>
                 <TextField
                   className={classes.textFieldParser}
+                  inputRef={ref => (this.inputRef = ref)}
                   label="Parser (Report Queue):"
                   multiline
-                  value={placeholderText}
+                  rows={9}
+                  value={parserQueue}
                   InputLabelProps={{
                     shrink: true,
                   }}
                   disabled={!user}
+                  onFocus={this.onFocus}
+                  onBlur={this.onBlur}
+                  onChange={this.onParse}
                 />
               </div>
             </div>
@@ -238,6 +270,7 @@ class NewReport extends Component {
         <CardActions>
           <Button
             variant="raised"
+            color="primary"
             onClick={this.onCreateReport}
             disabled={!user}
           >
