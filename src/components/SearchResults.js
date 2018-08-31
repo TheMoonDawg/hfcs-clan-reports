@@ -51,7 +51,7 @@ class SearchResults extends Component {
               {results.map(row => (
                 <TableRow key={row.id}>
                   <TableCell padding="dense">
-                    {moment(row.reportDate).format("MM/DD/YYYY HH:MM A")}
+                    {moment(row.reportDate).format("MM/DD/YYYY hh:mm A")}
                   </TableCell>
                   <TableCell padding="dense">{row.clanName}</TableCell>
                   <TableCell padding="dense">{row.clanMotto}</TableCell>

@@ -11,7 +11,6 @@ export default ({ cookieToken }, body) => {
   }
 
   return fetch(`../api/new`, options).then(result => {
-    if (result.status === 200) return result.json()
-    else throw result.statusText
+    if (result.status !== 200) throw result.statusText
   })
 }

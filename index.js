@@ -78,7 +78,7 @@ const getAuthToken = request => request.headers.authorization.substring(6)
 
 app.set("port", process.env.PORT || 5000)
 
-app.listen(app.get("port"), function() {
+app.listen(app.get("port"), () => {
   console.log("Node app is running on port", app.get("port"))
 })
 
@@ -88,7 +88,7 @@ app.listen(app.get("port"), function() {
 
 // Serve React files
 app.use(express.static(path.join(__dirname, "build")))
-app.get(["/", "/search", "/new", "/redirect"], function(request, response) {
+app.get(["/", "/search", "/new", "/redirect"], (_request, response) => {
   response.sendFile(path.join(__dirname, "build/index.html"))
 })
 
@@ -97,7 +97,7 @@ app.get(["/", "/search", "/new", "/redirect"], function(request, response) {
 // ---------------------------
 
 // Login
-app.get("/api/login", function(request, response) {
+app.get("/api/login", (request, response) => {
   const options = getAuthorizationRequestOptions(request.query.code)
   const cookieToken = uuidv4()
 
@@ -129,7 +129,7 @@ app.get("/api/login", function(request, response) {
 })
 
 // Search Clan Reports
-app.get("/api/search", function(request, response) {
+app.get("/api/search", (request, response) => {
   const queryString = request.query
   const token = getAuthToken(request)
 
@@ -196,37 +196,40 @@ app.get("/api/search", function(request, response) {
 })
 
 // New Clan Report
-app.post("/api/new", function(request, response) {
+app.post("/api/new", (request, response) => {
   const token = getAuthToken(request)
 
   getAccessTokens(token)
     .then(data => checkNinja(token, data.access_token, data.refresh_token))
-    .then(user => {
-      let jsonString = ""
+    .then(
+      user =>
+        new Promise(resolve => {
+          let body = ""
 
-      request.on("data", function(data) {
-        jsonString += data
-      })
+          request
+            .on("data", chunk => {
+              body += chunk
+            })
+            .on("end", () => {
+              const data = JSON.parse(body)
 
-      request.on("end", function() {
-        const data = JSON.parse(jsonString)
+              // Form query
+              const query =
+                "INSERT INTO report(clan_id, clan_name, clan_motto, clan_mission_statement, notes, ninja_id, judgment, report_date) Values($1, $2, $3, $4, $5, $6, $7, NOW());"
+              const params = [
+                data.id,
+                data.name,
+                data.motto,
+                data.missionStatement,
+                data.notes,
+                user.membershipId,
+                data.judgment,
+              ]
 
-        // Form query
-        const query =
-          "INSERT INTO report(clan_id, clan_name, clan_motto, clan_mission_statement, notes, ninja_id, judgment, report_date) Values($1, $2, $3, $4, $5, $6, $7, NOW());"
-        const params = [
-          data.clanId,
-          data.clanName,
-          data.clanMotto,
-          data.clanMissionStatement,
-          data.notes,
-          user.membershipId,
-          data.judgment,
-        ]
-
-        return executeQuery(query, params)
-      })
-    })
+              resolve(executeQuery(query, params))
+            })
+        }),
+    )
     .then(() => {
       response.statusCode = OK
       response.send()

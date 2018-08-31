@@ -1,8 +1,8 @@
 import React, { PureComponent } from "react"
 
-import Snackbar from "@material-ui/core/Snackbar"
+import MUISnackbar from "@material-ui/core/Snackbar"
 
-class ErrorSnackbar extends PureComponent {
+class Snackbar extends PureComponent {
   onClose = (_e, reason) => {
     if (reason === "timeout") this.props.onClose()
   }
@@ -11,7 +11,7 @@ class ErrorSnackbar extends PureComponent {
     const { open, message } = this.props
 
     return (
-      <Snackbar
+      <MUISnackbar
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "right",
@@ -25,4 +25,4 @@ class ErrorSnackbar extends PureComponent {
   }
 }
 
-export default ErrorSnackbar
+export default Snackbar

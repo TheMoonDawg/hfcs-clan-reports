@@ -10,6 +10,7 @@ import { MuiThemeProvider } from "@material-ui/core/styles"
 import NewReport from "./components/NewReport"
 import Redirect from "./components/Redirect"
 import Search from "./components/Search"
+import Snackbar from "./components/Snackbar"
 import theme from "./theme"
 
 class App extends Component {
@@ -33,18 +34,33 @@ class App extends Component {
     this.setState({ user: null })
   }
 
+  onOpenSnackbar = message => this.setState({ open: true, message })
+  onCloseSnackbar = () => this.setState({ open: false })
+
   indexComponent = () => <RouterRedirect to="/search" />
 
-  searchComponent = props => <Search user={this.state.user} {...props} />
+  searchComponent = props => (
+    <Search
+      user={this.state.user}
+      onOpenSnackbar={this.onOpenSnackbar}
+      {...props}
+    />
+  )
 
-  newReportComponent = props => <NewReport user={this.state.user} {...props} />
+  newReportComponent = props => (
+    <NewReport
+      user={this.state.user}
+      onOpenSnackbar={this.onOpenSnackbar}
+      {...props}
+    />
+  )
 
   redirectComponent = props => (
     <Redirect user={this.state.user} onSetUser={this.onSetUser} {...props} />
   )
 
   render() {
-    const { user } = this.state
+    const { user, open, message } = this.state
 
     return (
       <MuiThemeProvider theme={theme}>
@@ -54,6 +70,12 @@ class App extends Component {
             <Route exact path="/search" component={this.searchComponent} />
             <Route exact path="/new" component={this.newReportComponent} />
             <Route exact path="/redirect" component={this.redirectComponent} />
+
+            <Snackbar
+              open={open}
+              message={message}
+              onClose={this.onCloseSnackbar}
+            />
           </AppLayout>
         </BrowserRouter>
       </MuiThemeProvider>

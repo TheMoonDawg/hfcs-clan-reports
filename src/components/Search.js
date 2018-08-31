@@ -5,7 +5,6 @@ import Card from "@material-ui/core/Card"
 import CardActions from "@material-ui/core/CardActions"
 import CardContent from "@material-ui/core/CardContent"
 import CardHeader from "@material-ui/core/CardHeader"
-import ErrorSnackbar from "./ErrorSnackbar"
 import SearchResults from "./SearchResults"
 import TextField from "@material-ui/core/TextField"
 import getReports from "../requests/getReports"
@@ -31,40 +30,34 @@ class Search extends Component {
   onIdChange = this.onChange("id")
   onNameChange = this.onChange("name")
 
-  fetchReports = params => {
-    const { user } = this.props
+  onFetchReports = params => {
+    const { user, onOpenSnackbar } = this.props
+
     getReports(user, params)
       .then(result => {
         this.setState({ results: result })
       })
-      .catch(message =>
-        this.setState({
-          open: true,
-          message,
-        }),
-      )
+      .catch(onOpenSnackbar)
   }
 
   onSearch = () => {
     const { id, name } = this.state
     const params = { clan_id: id.trim(), clan_name: name.trim() }
-    this.fetchReports(params)
+    this.onFetchReports(params)
   }
 
   onLast50Reports = () => {
     const params = { last_50_reports: true }
-    this.fetchReports(params)
+    this.onFetchReports(params)
   }
 
   onUserLast100Reports = () => {
     const params = { user_100_reports: true }
-    this.fetchReports(params)
+    this.onFetchReports(params)
   }
 
-  onCloseSnackbar = () => this.setState({ open: false })
-
   render() {
-    const { id, name, results, open, message } = this.state
+    const { id, name, results } = this.state
     const { classes, user } = this.props
 
     return (
@@ -116,12 +109,6 @@ class Search extends Component {
         </Card>
 
         {results && <SearchResults title="Search Results" results={results} />}
-
-        <ErrorSnackbar
-          open={open}
-          message={message}
-          onClose={this.onCloseSnackbar}
-        />
       </React.Fragment>
     )
   }
