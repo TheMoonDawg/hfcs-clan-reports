@@ -10,8 +10,10 @@ import IconButton from "@material-ui/core/IconButton"
 import MenuItem from "@material-ui/core/MenuItem"
 import SearchResults from "./SearchResults"
 import TextField from "@material-ui/core/TextField"
+import Tooltip from "@material-ui/core/Tooltip"
 import classnames from "classnames"
 import createReport from "../requests/createReport"
+import getClanData from "../requests/getClanData"
 import getReports from "../requests/getReports"
 import { withStyles } from "@material-ui/core/styles"
 
@@ -91,6 +93,7 @@ class NewReport extends Component {
   onMottoChange = this.onChange("motto")
   onMissionStatementChange = this.onChange("missionStatement")
   onNotesChange = this.onChange("notes")
+  onParserClanIdChange = this.onChange("parserClanId")
 
   onFocus = () => this.setState({ parserQueue: "" })
   onBlur = () => this.setState({ parserQueue: placeholderText })
@@ -119,6 +122,18 @@ class NewReport extends Component {
   }
 
   onIdBlur = () => this.onFetchReports(this.state.id)
+
+  onFetchClanData = () => {
+    const { parserClanId } = this.state
+    const { user, onOpenSnackbar } = this.props
+
+    getClanData(user, parserClanId)
+      .then(result => {
+        this.setState({ ...initState, ...result })
+        this.onFetchReports(result.id)
+      })
+      .catch(onOpenSnackbar)
+  }
 
   onFetchReports = clanId => {
     const { user, onOpenSnackbar } = this.props
@@ -185,9 +200,9 @@ class NewReport extends Component {
                   className={classnames(classes.margin, classes.textField200)}
                   select
                   label="Judgment:"
+                  disabled={!user}
                   value={judgment}
                   onChange={this.onJudgmentChange}
-                  disabled={!user}
                 >
                   <MenuItem value="Warning">Warning</MenuItem>
                   <MenuItem value="7 Day Ban">7 Day Ban</MenuItem>
@@ -202,12 +217,12 @@ class NewReport extends Component {
                   type="number"
                   className={classnames(classes.margin, classes.textField200)}
                   label="Clan Id:"
-                  value={id}
-                  onChange={this.onIdChange}
-                  onBlur={this.onIdBlur}
                   required={required}
                   error={required}
                   disabled={!user}
+                  value={id}
+                  onChange={this.onIdChange}
+                  onBlur={this.onIdBlur}
                 />
 
                 <br />
@@ -216,11 +231,11 @@ class NewReport extends Component {
                 <TextField
                   className={classnames(classes.margin, classes.textField400)}
                   label="Clan Name:"
-                  value={name}
-                  onChange={this.onNameChange}
                   required={required}
                   error={required}
                   disabled={!user}
+                  value={name}
+                  onChange={this.onNameChange}
                 />
 
                 <br />
@@ -229,9 +244,9 @@ class NewReport extends Component {
                 <TextField
                   className={classnames(classes.margin, classes.textField400)}
                   label="Clan Motto:"
+                  disabled={!user}
                   value={motto}
                   onChange={this.onMottoChange}
-                  disabled={!user}
                 />
 
                 <br />
@@ -248,9 +263,9 @@ class NewReport extends Component {
                     multiline
                     rowsMax={6}
                     label="Clan Mission Statement:"
+                    disabled={!user}
                     value={missionStatement}
                     onChange={this.onMissionStatementChange}
-                    disabled={!user}
                   />
                 </div>
 
@@ -261,9 +276,9 @@ class NewReport extends Component {
                     multiline
                     rowsMax={6}
                     label="Notes:"
+                    disabled={!user}
                     value={notes}
                     onChange={this.onNotesChange}
-                    disabled={!user}
                   />
                 </div>
               </div>
@@ -275,17 +290,33 @@ class NewReport extends Component {
                 {/* Clan Id Parser */}
                 <div className={classes.parserClanIdContainer}>
                   <TextField
+                    type="number"
                     className={classnames(
                       classes.margin,
                       classes.textFieldParser,
                     )}
                     label="Parser (Clan Id):"
                     disabled={!user}
+                    value={parserClanId}
+                    onChange={this.onParserClanIdChange}
                   />
 
-                  <IconButton className={classes.iconButton} disabled={!user}>
-                    <Icon>search</Icon>
-                  </IconButton>
+                  <Tooltip
+                    title="Get Clan Data"
+                    disableFocusListener={!user}
+                    disableTouchListener={!user}
+                    disableHoverListener={!user}
+                  >
+                    <div>
+                      <IconButton
+                        className={classes.iconButton}
+                        disabled={!user}
+                        onClick={this.onFetchClanData}
+                      >
+                        <Icon>search</Icon>
+                      </IconButton>
+                    </div>
+                  </Tooltip>
                 </div>
 
                 <br />
@@ -315,8 +346,8 @@ class NewReport extends Component {
             <Button
               variant="raised"
               color="primary"
-              onClick={this.onCreateReport}
               disabled={!user}
+              onClick={this.onCreateReport}
             >
               Create Report
             </Button>

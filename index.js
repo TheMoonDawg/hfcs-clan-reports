@@ -52,7 +52,16 @@ const getRefreshRequestOptions = refreshToken => ({
 })
 
 const getUserRequestOptions = accessToken => ({
-  url: "http://www.bungie.net/Platform/User/GetCurrentBungieAccount/",
+  url: "https://www.bungie.net/Platform/User/GetCurrentBungieAccount/",
+  method: "GET",
+  headers: {
+    "X-API-Key": apiKey,
+    Authorization: `Bearer ${accessToken}`,
+  },
+})
+
+const getClanOptions = (accessToken, clanId) => ({
+  url: `https://www.bungie.net/Platform/GroupV2/${clanId}`,
   method: "GET",
   headers: {
     "X-API-Key": apiKey,
@@ -62,12 +71,15 @@ const getUserRequestOptions = accessToken => ({
 
 const OK = 200
 const UNAUTHORIZED = 401
+const NOT_FOUND = 404
 const SERVER_ERROR = 500
 
 const getErrorMessage = statusCode => {
   switch (statusCode) {
     case 401:
       return "Hey, you're not allowed to be here. Shoo!"
+    case 404:
+      return "Clan not found!"
     case 500:
     default:
       return "An internal server error has occurred... yell at MoonDawg to fix it."
@@ -195,6 +207,43 @@ app.get("/api/search", (request, response) => {
     })
 })
 
+// Get Clan info from Bnet
+app.get("/api/clan", (request, response) => {
+  const clanId = request.query.clan_id
+  const token = getAuthToken(request)
+
+  getAccessTokens(token)
+    .then(data => checkNinja(token, data.access_token, data.refresh_token))
+    .then(({ accessToken }) => {
+      const options = getClanOptions(accessToken, clanId)
+      return requestPromise(options)
+    })
+    .catch(({ statusCode }) => {
+      throw statusCode
+    })
+    .then(response => {
+      const jsonResponse = JSON.parse(response)
+      if (jsonResponse.ErrorStatus === "GroupNotFound") throw NOT_FOUND
+
+      const clan = jsonResponse.Response.detail
+      return {
+        id: clan.groupId,
+        name: clan.name,
+        motto: clan.motto,
+        missionStatement: clan.about,
+      }
+    })
+    .then(data => {
+      response.statusCode = OK
+      response.send(data)
+    })
+    .catch(statusCode => {
+      response.statusCode = statusCode
+      response.statusMessage = getErrorMessage(statusCode)
+      response.end()
+    })
+})
+
 // New Clan Report
 app.post("/api/new", (request, response) => {
   const token = getAuthToken(request)
@@ -213,7 +262,6 @@ app.post("/api/new", (request, response) => {
             .on("end", () => {
               const data = JSON.parse(body)
 
-              // Form query
               const query =
                 "INSERT INTO report(clan_id, clan_name, clan_motto, clan_mission_statement, notes, ninja_id, judgment, report_date) Values($1, $2, $3, $4, $5, $6, $7, NOW());"
               const params = [
