@@ -11,8 +11,8 @@ const styles = ({ palette }) => ({
 class LoggedOut extends Component {
   render() {
     const { classes } = this.props
-    const clientId = 24432 // Test
-    // const clientId = 21650 // Live
+    // const clientId = 24432 // Test
+    const clientId = 21650 // Live
 
     return (
       <a
