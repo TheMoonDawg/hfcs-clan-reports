@@ -50,3 +50,10 @@ VALUES
     (5696684, 'Psyperactive81'),
     (8878733, 'truexadir'),
     (5651783, 'Pobreloko');
+
+-- Transfer data from old table
+INSERT INTO report
+    (clan_id, clan_name, clan_motto, clan_mission_statement, notes, ninja_id, judgment, report_date)
+SELECT r.clanid, r.clanname, r.clanmotto, r.clanmissionstatement, r.notes, n.ninja_id, r.judgment, r.reportdate
+FROM reports r
+    LEFT JOIN ninja n ON n.display_name = r.ninja;
