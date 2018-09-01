@@ -148,7 +148,7 @@ class NewReport extends Component {
 
   onCreateReport = () => {
     const { id, name, motto, missionStatement, notes, judgment } = this.state
-    const { user, onOpenSnackbar } = this.props
+    const { user, onOpenSnackbar, onError } = this.props
 
     if (!id.trim() || !name.trim()) {
       this.setState({ required: true })
