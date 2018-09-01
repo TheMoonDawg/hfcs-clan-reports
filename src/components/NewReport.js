@@ -26,45 +26,45 @@ const parseText = (report, regex) => {
 
 const styles = ({ spacing, palette }) => ({
   card: {
-    marginBottom: spacing.unit * 3,
+    marginBottom: spacing.unit * 3
   },
   container: {
-    display: "flex",
+    display: "flex"
   },
   flex: {
-    flex: 1,
+    flex: 1
   },
   margin: {
-    marginBottom: spacing.unit,
+    marginBottom: spacing.unit
   },
   textField200: {
-    width: 200,
+    width: 200
   },
   textField400: {
-    width: 400,
+    width: 400
   },
   textField600: {
-    width: 600,
+    width: 600
   },
   textBoxContainer: {
     background: palette.secondary.main,
     borderRadius: 4,
-    padding: spacing.unit,
+    padding: spacing.unit
   },
   parserContainer: {
-    width: 250,
+    width: 250
   },
   textFieldParser: {
-    width: "100%",
+    width: "100%"
   },
   parserClanIdContainer: {
     display: "flex",
-    alignItems: "center",
+    alignItems: "center"
   },
   iconButton: {
     width: spacing.unit * 4,
-    height: spacing.unit * 4,
-  },
+    height: spacing.unit * 4
+  }
 })
 
 const initState = {
@@ -77,12 +77,12 @@ const initState = {
   parserClanId: "",
   parserQueue: placeholderText,
   required: false,
-  results: null,
+  results: null
 }
 
 class NewReport extends Component {
   state = {
-    ...initState,
+    ...initState
   }
 
   onChange = key => event => this.setState({ [key]: event.target.value })
@@ -112,7 +112,7 @@ class NewReport extends Component {
       id: clanId,
       name: parseText(report, nameMatch),
       motto: parseText(report, mottoMatch),
-      missionStatement: parseText(report, statementMatch),
+      missionStatement: parseText(report, statementMatch)
     })
 
     this.inputRef.blur()
@@ -124,24 +124,26 @@ class NewReport extends Component {
 
   onFetchClanData = () => {
     const { parserClanId } = this.state
-    const { user, onOpenSnackbar } = this.props
+    const { user, onError } = this.props
 
     getClanData(user, parserClanId)
       .then(result => {
         this.setState({ ...initState, ...result })
         this.onFetchReports(result.id)
       })
-      .catch(onOpenSnackbar)
+      .catch(onError)
   }
 
   onFetchReports = clanId => {
-    const { user, onOpenSnackbar } = this.props
+    const { user, onError } = this.props
+
+    this.setState({ results: null })
 
     getReports(user, { clan_id: clanId })
       .then(result => {
         this.setState({ results: result })
       })
-      .catch(onOpenSnackbar)
+      .catch(onError)
   }
 
   onCreateReport = () => {
@@ -161,7 +163,7 @@ class NewReport extends Component {
       motto,
       missionStatement,
       notes,
-      judgment,
+      judgment
     }
 
     createReport(user, body)
@@ -169,7 +171,7 @@ class NewReport extends Component {
         onOpenSnackbar("Report successfully added!")
         this.setState(initState)
       })
-      .catch(onOpenSnackbar)
+      .catch(onError)
   }
 
   render() {
@@ -183,7 +185,7 @@ class NewReport extends Component {
       parserClanId,
       parserQueue,
       required,
-      results,
+      results
     } = this.state
     const { classes, user } = this.props
     const userName = user ? user.name : null
@@ -254,7 +256,7 @@ class NewReport extends Component {
                 <div
                   className={classnames(
                     classes.margin,
-                    classes.textBoxContainer,
+                    classes.textBoxContainer
                   )}
                 >
                   <TextField
@@ -292,7 +294,7 @@ class NewReport extends Component {
                     type="number"
                     className={classnames(
                       classes.margin,
-                      classes.textFieldParser,
+                      classes.textFieldParser
                     )}
                     label="Parser (Clan Id):"
                     disabled={!user}
@@ -330,7 +332,7 @@ class NewReport extends Component {
                     rows={9}
                     value={parserQueue}
                     InputLabelProps={{
-                      shrink: true,
+                      shrink: true
                     }}
                     disabled={!user}
                     onFocus={this.onFocus}
@@ -353,10 +355,9 @@ class NewReport extends Component {
           </CardActions>
         </Card>
 
-        {results &&
-          results.length > 0 && (
-            <SearchResults title="Previous Offenses" results={results} />
-          )}
+        {results && (
+          <SearchResults title="Previous Offenses" results={results} />
+        )}
       </React.Fragment>
     )
   }

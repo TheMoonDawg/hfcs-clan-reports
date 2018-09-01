@@ -13,7 +13,7 @@ class Snackbar extends PureComponent {
       <MUISnackbar
         anchorOrigin={{
           vertical: "bottom",
-          horizontal: "right",
+          horizontal: "right"
         }}
         open={open}
         message={message}

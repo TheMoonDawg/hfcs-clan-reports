@@ -5,17 +5,17 @@ import { withStyles } from "@material-ui/core/styles"
 const styles = ({ spacing }) => ({
   container: {
     display: "block",
-    textAlign: "right",
+    textAlign: "right"
   },
   logOut: {
     cursor: "pointer",
-    textDecoration: "underline",
+    textDecoration: "underline"
   },
   avatar: {
     width: 45,
     height: 45,
-    marginLeft: spacing.unit * 2,
-  },
+    marginLeft: spacing.unit * 2
+  }
 })
 
 class AuthorizedUser extends Component {

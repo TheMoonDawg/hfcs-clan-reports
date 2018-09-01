@@ -11,18 +11,18 @@ import SearchResults from "./SearchResults"
 
 const styles = ({ spacing }) => ({
   card: {
-    marginBottom: spacing.unit * 3,
+    marginBottom: spacing.unit * 3
   },
   textField: {
     width: 200,
-    marginBottom: spacing.unit,
-  },
+    marginBottom: spacing.unit
+  }
 })
 
 class Search extends Component {
   state = {
     id: "",
-    name: "",
+    name: ""
   }
 
   onChange = key => event => this.setState({ [key]: event.target.value })
@@ -30,13 +30,13 @@ class Search extends Component {
   onNameChange = this.onChange("name")
 
   onFetchReports = params => {
-    const { user, onOpenSnackbar } = this.props
+    const { user, onError } = this.props
 
     getReports(user, params)
       .then(result => {
         this.setState({ results: result })
       })
-      .catch(onOpenSnackbar)
+      .catch(onError)
   }
 
   onSearch = () => {

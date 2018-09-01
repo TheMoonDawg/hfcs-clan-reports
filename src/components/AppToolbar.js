@@ -8,24 +8,24 @@ import LoggedOut from "./LoggedOut"
 
 const styles = ({ zIndex, spacing }) => ({
   appBar: {
-    zIndex: zIndex.drawer + 1,
+    zIndex: zIndex.drawer + 1
   },
   container: {
     display: "block",
-    textAlign: "right",
+    textAlign: "right"
   },
   flex: {
-    flex: 1,
+    flex: 1
   },
   logOut: {
     cursor: "pointer",
-    textDecoration: "underline",
+    textDecoration: "underline"
   },
   avatar: {
     width: 45,
     height: 45,
-    marginLeft: spacing.unit * 2,
-  },
+    marginLeft: spacing.unit * 2
+  }
 })
 
 class AppToolbar extends Component {

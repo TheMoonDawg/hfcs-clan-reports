@@ -36,9 +36,9 @@ const getAuthorizationRequestOptions = code => ({
   method: "POST",
   headers: {
     "X-API-Key": apiKey,
-    "Content-Type": "application/x-www-form-urlencoded",
+    "Content-Type": "application/x-www-form-urlencoded"
   },
-  body: `grant_type=authorization_code&code=${code}&client_id=${clientId}&client_secret=${clientSecret}`,
+  body: `grant_type=authorization_code&code=${code}&client_id=${clientId}&client_secret=${clientSecret}`
 })
 
 const getRefreshRequestOptions = refreshToken => ({
@@ -46,9 +46,9 @@ const getRefreshRequestOptions = refreshToken => ({
   method: "POST",
   headers: {
     "X-API-Key": apiKey,
-    "Content-Type": "application/x-www-form-urlencoded",
+    "Content-Type": "application/x-www-form-urlencoded"
   },
-  body: `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`,
+  body: `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`
 })
 
 const getUserRequestOptions = accessToken => ({
@@ -56,8 +56,8 @@ const getUserRequestOptions = accessToken => ({
   method: "GET",
   headers: {
     "X-API-Key": apiKey,
-    Authorization: `Bearer ${accessToken}`,
-  },
+    Authorization: `Bearer ${accessToken}`
+  }
 })
 
 const getClanOptions = (accessToken, clanId) => ({
@@ -65,8 +65,8 @@ const getClanOptions = (accessToken, clanId) => ({
   method: "GET",
   headers: {
     "X-API-Key": apiKey,
-    Authorization: `Bearer ${accessToken}`,
-  },
+    Authorization: `Bearer ${accessToken}`
+  }
 })
 
 const OK = 200
@@ -126,8 +126,8 @@ app.get("/api/login", (request, response) => {
         model.membershipId,
         model.cookieToken,
         accessToken,
-        refreshToken,
-      ).then(() => model),
+        refreshToken
+      ).then(() => model)
     )
     .then(model => {
       response.statusCode = OK
@@ -230,7 +230,7 @@ app.get("/api/clan", (request, response) => {
         id: clan.groupId,
         name: clan.name,
         motto: clan.motto,
-        missionStatement: clan.about,
+        missionStatement: clan.about
       }
     })
     .then(data => {
@@ -271,12 +271,12 @@ app.post("/api/new", (request, response) => {
                 data.missionStatement,
                 data.notes,
                 user.membershipId,
-                data.judgment,
+                data.judgment
               ]
 
               resolve(executeQuery(query, params))
             })
-        }),
+        })
     )
     .then(() => {
       response.statusCode = OK
@@ -326,13 +326,13 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
                       user.membershipId,
                       cookieToken,
                       tokens.access_token,
-                      tokens.refresh_token,
+                      tokens.refresh_token
                     ).then(() => {
                       model = generateModel(
                         user,
                         cookieToken,
                         tokens.access_token,
-                        tokens.refresh_token,
+                        tokens.refresh_token
                       )
                     })
                   })
@@ -344,8 +344,8 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
       .then(() =>
         executeQuery(
           "SELECT display_name FROM ninja WHERE ninja_id = $1 AND active",
-          [model.membershipId],
-        ),
+          [model.membershipId]
+        )
       )
       .then(result => {
         if (result.length == 0) throw UNAUTHORIZED
@@ -366,12 +366,12 @@ const generateModel = (user, cookieToken, accessToken, refreshToken) => ({
   resources,
   cookieToken,
   accessToken,
-  refreshToken,
+  refreshToken
 })
 
 const getAccessTokens = cookieToken =>
   executeQuery("SELECT * FROM token WHERE cookie_token=$1;", [
-    cookieToken,
+    cookieToken
   ]).then(data => {
     if (!data || data.length === 0) {
       throw UNAUTHORIZED
@@ -384,7 +384,7 @@ const getAccessTokens = cookieToken =>
 
 const updateTokens = (membershipId, cookieToken, accessToken, refreshToken) =>
   executeQuery("SELECT ninja_id FROM token WHERE ninja_id=$1", [
-    membershipId,
+    membershipId
   ]).then(result => {
     let query, params
 

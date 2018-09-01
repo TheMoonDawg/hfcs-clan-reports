@@ -14,15 +14,15 @@ import { withStyles } from "@material-ui/core/styles"
 
 const styles = ({ spacing }) => ({
   content: {
-    overflow: 'auto'
+    overflow: "auto"
   },
   link: {
-    textDecoration: "none",
+    textDecoration: "none"
   },
   iconButton: {
     width: spacing.unit * 4,
-    height: spacing.unit * 4,
-  },
+    height: spacing.unit * 4
+  }
 })
 
 const generateLink = clanId =>

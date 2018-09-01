@@ -17,21 +17,21 @@ const drawerWidth = 240
 const styles = ({ mixins, spacing, palette }) => ({
   drawerPaper: {
     position: "relative",
-    width: drawerWidth,
+    width: drawerWidth
   },
   toolbar: mixins.toolbar,
   link: {
     textDecoration: "none",
-    color: "inherit",
+    color: "inherit"
   },
   container: {
     display: "flex",
     flexDirection: "column",
-    height: "100%",
+    height: "100%"
   },
   resourcesLabel: {
     marginLeft: spacing.unit,
-    marginBottom: spacing.unit * 3,
+    marginBottom: spacing.unit * 3
   },
   resourcesContainer: {
     marginLeft: spacing.unit,
@@ -40,17 +40,17 @@ const styles = ({ mixins, spacing, palette }) => ({
       display: "block",
       color: palette.common.white,
       textDecoration: "none",
-      marginBottom: spacing.unit,
-    },
+      marginBottom: spacing.unit
+    }
   },
   flex: {
-    flex: 1,
-  },
+    flex: 1
+  }
 })
 
 class AppMenu extends Component {
   state = {
-    renderImage: false,
+    renderImage: false
   }
 
   renderImage = () => this.setState({ renderImage: true })
@@ -64,7 +64,7 @@ class AppMenu extends Component {
       <Drawer
         variant="permanent"
         classes={{
-          paper: classes.drawerPaper,
+          paper: classes.drawerPaper
         }}
       >
         <div className={classes.toolbar} />

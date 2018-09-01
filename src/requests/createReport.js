@@ -6,11 +6,11 @@ export default ({ cookieToken }, body) => {
     body: JSON.stringify(body),
     headers: {
       "Content-Type": "application/json",
-      ...generateAuthHeader(cookieToken),
-    },
+      ...generateAuthHeader(cookieToken)
+    }
   }
 
-  return fetch(`../api/new`, options).then(result => {
-    if (result.status !== 200) throw result.statusText
+  return fetch(`../api/new`, options).then(({ status, statusText }) => {
+    if (status !== 200) throw { status, statusText }
   })
 }

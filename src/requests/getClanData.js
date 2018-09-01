@@ -8,7 +8,7 @@ export default ({ cookieToken }, clanId) => {
   return fetch(`../api/clan?${queryString.stringify(params)}`, options).then(
     result => {
       if (result.status === 200) return result.json()
-      else throw result.statusText
-    },
+      else throw { status: result.status, statusText: result.statusText }
+    }
   )
 }

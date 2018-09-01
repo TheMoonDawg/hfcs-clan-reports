@@ -1,5 +1,5 @@
-import { createMuiTheme } from "@material-ui/core/styles"
 import grey from "@material-ui/core/colors/grey"
+import { createMuiTheme } from "@material-ui/core/styles"
 
 export default createMuiTheme({
   palette: {
@@ -7,9 +7,9 @@ export default createMuiTheme({
       light: "#209CE0",
       main: "#103346",
       dark: "#103346",
-      contrastText: "#FFF",
+      contrastText: "#FFF"
     },
     secondary: grey,
-    type: "dark",
-  },
+    type: "dark"
+  }
 })

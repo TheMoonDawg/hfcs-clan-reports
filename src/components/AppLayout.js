@@ -7,16 +7,16 @@ const styles = theme => ({
   root: {
     display: "flex",
     zIndex: 1,
-    height: "100%",
+    height: "100%"
   },
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing.unit * 3,
     minWidth: 0, // So the Typography noWrap works
-    overflow: "auto",
+    overflow: "auto"
   },
-  toolbar: theme.mixins.toolbar,
+  toolbar: theme.mixins.toolbar
 })
 
 class AppLayout extends Component {

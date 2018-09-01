@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import {
   BrowserRouter,
   Route,
-  Redirect as RouterRedirect,
+  Redirect as RouterRedirect
 } from "react-router-dom"
 import { MuiThemeProvider } from "@material-ui/core/styles"
 import AppLayout from "./components/AppLayout"
@@ -14,7 +14,7 @@ import theme from "./theme"
 
 class App extends Component {
   state = {
-    user: null,
+    user: null
   }
 
   componentDidMount() {
@@ -33,29 +33,33 @@ class App extends Component {
     this.setState({ user: null })
   }
 
+  onError = ({ status, statusText }) => {
+    this.onOpenSnackbar(statusText)
+
+    console.error(status, statusText)
+    if (status === 401) this.onLogOut()
+  }
+
   onOpenSnackbar = message => this.setState({ open: true, message })
   onCloseSnackbar = () => this.setState({ open: false })
 
   indexComponent = () => <RouterRedirect to="/search" />
 
   searchComponent = props => (
-    <Search
-      user={this.state.user}
-      onOpenSnackbar={this.onOpenSnackbar}
-      {...props}
-    />
+    <Search user={this.state.user} onError={this.onError} {...props} />
   )
 
   newReportComponent = props => (
     <NewReport
       user={this.state.user}
+      onError={this.onError}
       onOpenSnackbar={this.onOpenSnackbar}
       {...props}
     />
   )
 
   redirectComponent = props => (
-    <Redirect user={this.state.user} onSetUser={this.onSetUser} {...props} />
+    <Redirect onSetUser={this.onSetUser} onError={this.onError} {...props} />
   )
 
   render() {

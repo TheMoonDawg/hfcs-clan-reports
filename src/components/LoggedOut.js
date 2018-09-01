@@ -3,8 +3,8 @@ import { withStyles } from "@material-ui/core/styles"
 
 const styles = ({ palette }) => ({
   link: {
-    color: palette.common.white,
-  },
+    color: palette.common.white
+  }
 })
 
 class LoggedOut extends Component {
