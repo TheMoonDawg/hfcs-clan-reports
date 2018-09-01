@@ -149,7 +149,7 @@ app.get("/api/search", (request, response) => {
     .then(data => checkNinja(token, data.access_token, data.refresh_token))
     .then(user => {
       let query = `
-        SELECT  
+        SELECT
           r.id,
           r.report_date AS "reportDate",
           r.clan_id AS "clanId",
@@ -159,8 +159,8 @@ app.get("/api/search", (request, response) => {
           r.notes,
           n.display_name AS ninja,
           r.judgment
-        FROM report r 
-        JOIN ninja n ON n.ninja_id = r.ninja_id 
+        FROM report r
+        JOIN ninja n ON n.ninja_id = r.ninja_id
         WHERE 1=1
         `
       let paramNum = 1

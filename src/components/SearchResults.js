@@ -1,5 +1,5 @@
+import moment from "moment"
 import React, { Component } from "react"
-
 import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
 import CardHeader from "@material-ui/core/CardHeader"
@@ -10,10 +10,12 @@ import TableBody from "@material-ui/core/TableBody"
 import TableCell from "@material-ui/core/TableCell"
 import TableHead from "@material-ui/core/TableHead"
 import TableRow from "@material-ui/core/TableRow"
-import moment from "moment"
 import { withStyles } from "@material-ui/core/styles"
 
 const styles = ({ spacing }) => ({
+  table: {
+    overflow: 'auto'
+  },
   link: {
     textDecoration: "none",
   },
@@ -34,7 +36,7 @@ class SearchResults extends Component {
       <Card>
         <CardHeader title={`${title} - ${results.length} Reports`} />
         <CardContent>
-          <Table>
+          <Table className={classes.table}>
             <TableHead>
               <TableRow>
                 <TableCell padding="dense">Report Date</TableCell>

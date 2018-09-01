@@ -1,11 +1,10 @@
 import React, { Component } from "react"
-
 import AppBar from "@material-ui/core/AppBar"
-import AuthorizedUser from "./AuthorizedUser"
-import LoggedOut from "./LoggedOut"
 import Toolbar from "@material-ui/core/Toolbar"
 import Typography from "@material-ui/core/Typography"
 import { withStyles } from "@material-ui/core/styles"
+import AuthorizedUser from "./AuthorizedUser"
+import LoggedOut from "./LoggedOut"
 
 const styles = ({ zIndex, spacing }) => ({
   appBar: {

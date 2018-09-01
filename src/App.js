@@ -1,12 +1,11 @@
+import React, { Component } from "react"
 import {
   BrowserRouter,
   Route,
   Redirect as RouterRedirect,
 } from "react-router-dom"
-import React, { Component } from "react"
-
-import AppLayout from "./components/AppLayout"
 import { MuiThemeProvider } from "@material-ui/core/styles"
+import AppLayout from "./components/AppLayout"
 import NewReport from "./components/NewReport"
 import Redirect from "./components/Redirect"
 import Search from "./components/Search"

@@ -1,5 +1,5 @@
+import classnames from "classnames"
 import React, { Component } from "react"
-
 import Button from "@material-ui/core/Button"
 import Card from "@material-ui/core/Card"
 import CardActions from "@material-ui/core/CardActions"
@@ -8,14 +8,13 @@ import CardHeader from "@material-ui/core/CardHeader"
 import Icon from "@material-ui/core/Icon"
 import IconButton from "@material-ui/core/IconButton"
 import MenuItem from "@material-ui/core/MenuItem"
-import SearchResults from "./SearchResults"
 import TextField from "@material-ui/core/TextField"
 import Tooltip from "@material-ui/core/Tooltip"
-import classnames from "classnames"
+import { withStyles } from "@material-ui/core/styles"
 import createReport from "../requests/createReport"
 import getClanData from "../requests/getClanData"
 import getReports from "../requests/getReports"
-import { withStyles } from "@material-ui/core/styles"
+import SearchResults from "./SearchResults"
 
 const placeholderText =
   "Ex:\nClan Reported:\nCLAN NAME (id: 123456)\n\nClan Motto:\nCLAN MOTTO\n\nClan Mission Statement:\nCLAN MISSION STATEMENT"

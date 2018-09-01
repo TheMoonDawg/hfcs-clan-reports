@@ -1,14 +1,13 @@
 import React, { Component } from "react"
-
 import Button from "@material-ui/core/Button"
 import Card from "@material-ui/core/Card"
 import CardActions from "@material-ui/core/CardActions"
 import CardContent from "@material-ui/core/CardContent"
 import CardHeader from "@material-ui/core/CardHeader"
-import SearchResults from "./SearchResults"
 import TextField from "@material-ui/core/TextField"
-import getReports from "../requests/getReports"
 import { withStyles } from "@material-ui/core/styles"
+import getReports from "../requests/getReports"
+import SearchResults from "./SearchResults"
 
 const styles = ({ spacing }) => ({
   card: {

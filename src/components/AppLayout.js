@@ -1,8 +1,7 @@
 import React, { Component } from "react"
-
+import { withStyles } from "@material-ui/core/styles"
 import AppMenu from "./AppMenu"
 import AppToolbar from "./AppToolbar"
-import { withStyles } from "@material-ui/core/styles"
 
 const styles = theme => ({
   root: {

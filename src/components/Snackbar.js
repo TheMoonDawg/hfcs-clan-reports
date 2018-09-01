@@ -1,5 +1,4 @@
 import React, { PureComponent } from "react"
-
 import MUISnackbar from "@material-ui/core/Snackbar"
 
 class Snackbar extends PureComponent {

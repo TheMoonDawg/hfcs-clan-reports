@@ -1,5 +1,5 @@
-import generateAuthHeader from "../utils/generateAuthHeader"
 import queryString from "query-string"
+import generateAuthHeader from "../utils/generateAuthHeader"
 
 export default ({ cookieToken }, clanId) => {
   const options = { headers: generateAuthHeader(cookieToken) }

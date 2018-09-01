@@ -1,8 +1,7 @@
+import queryString from "query-string"
 import React, { Component } from "react"
-
 import { Redirect as RouterRedirect } from "react-router-dom"
 import Typography from "@material-ui/core/Typography"
-import queryString from "query-string"
 
 class Redirect extends Component {
   componentDidMount() {
