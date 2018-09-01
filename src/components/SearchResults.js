@@ -13,7 +13,7 @@ import TableRow from "@material-ui/core/TableRow"
 import { withStyles } from "@material-ui/core/styles"
 
 const styles = ({ spacing }) => ({
-  table: {
+  content: {
     overflow: 'auto'
   },
   link: {
@@ -35,8 +35,8 @@ class SearchResults extends Component {
     return (
       <Card>
         <CardHeader title={`${title} - ${results.length} Reports`} />
-        <CardContent>
-          <Table className={classes.table}>
+        <CardContent className={classes.content}>
+          <Table>
             <TableHead>
               <TableRow>
                 <TableCell padding="dense">Report Date</TableCell>
