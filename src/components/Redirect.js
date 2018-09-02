@@ -2,6 +2,7 @@ import queryString from "query-string"
 import React, { Component } from "react"
 import { Redirect as RouterRedirect } from "react-router-dom"
 import Typography from "@material-ui/core/Typography"
+import logIn from "../requests/logIn"
 
 class Redirect extends Component {
   state = {
@@ -13,16 +14,10 @@ class Redirect extends Component {
     const { code } = queryString.parse(this.props.location.search)
 
     if (code && !localStorage.hasOwnProperty("user")) {
-      fetch(`../api/login?code=${code}`)
-        .then(result => result.json())
-        .then(result => {
-          onSetUser(result)
-          this.redirect()
-        })
-        .catch(error => {
-          onError(error)
-          this.redirect()
-        })
+      logIn(code)
+        .then(onSetUser)
+        .catch(onError)
+        .then(this.redirect)
     }
   }
 
