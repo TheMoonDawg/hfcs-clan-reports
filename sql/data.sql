@@ -57,3 +57,29 @@ INSERT INTO report
 SELECT r.clanid, r.clanname, r.clanmotto, r.clanmissionstatement, r.notes, n.ninja_id, r.judgment, r.reportdate
 FROM reports r
     LEFT JOIN ninja n ON n.display_name = r.ninja;
+
+-- Update regions for ninjas
+-- German
+UPDATE ninja
+SET region = 'German'
+WHERE ninja_id = 1093770 OR ninja_id = 1292876;
+
+-- Spanish
+UPDATE ninja
+SET region = 'Spanish'
+WHERE ninja_id = 5696684 OR ninja_id = 5651783;
+
+-- French
+UPDATE ninja
+SET region = 'French'
+WHERE ninja_id = 5666728;
+
+-- Italian
+UPDATE ninja
+SET region = 'Italian'
+WHERE ninja_id = 4864368 OR ninja_id = 924570;
+
+-- Portuguese
+UPDATE ninja
+SET region = 'Portuguese'
+WHERE ninja_id = 8878733;

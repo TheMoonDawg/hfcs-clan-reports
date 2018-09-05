@@ -25,3 +25,7 @@ CREATE TABLE token
     refresh_token TEXT NOT NULL,
     cookie_token TEXT NOT NULL
 );
+
+-- Add region column
+ALTER TABLE ninja
+ADD COLUMN region TEXT NOT NULL DEFAULT 'English';
