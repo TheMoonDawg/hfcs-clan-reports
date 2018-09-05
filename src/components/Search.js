@@ -23,12 +23,11 @@ const styles = ({ spacing }) => ({
 class Search extends Component {
   state = {
     id: "",
-    name: "",
-    region: this.props.user ? this.props.user.region : "English"
+    name: ""
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.user && prevState.region !== nextProps.user.region) {
+    if (nextProps.user && !prevState.region) {
       return { region: nextProps.user.region }
     }
 

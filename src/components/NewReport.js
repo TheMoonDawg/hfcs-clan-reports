@@ -82,12 +82,11 @@ const initState = {
 
 class NewReport extends Component {
   state = {
-    ...initState,
-    region: this.props.user ? this.props.user.region : "English"
+    ...initState
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.user && prevState.region !== nextProps.user.region) {
+    if (nextProps.user && !prevState.region) {
       return { region: nextProps.user.region }
     }
 
