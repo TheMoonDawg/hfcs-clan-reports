@@ -30,6 +30,7 @@ class Search extends Component {
   onChange = key => event => this.setState({ [key]: event.target.value })
   onIdChange = this.onChange("id")
   onNameChange = this.onChange("name")
+  onRegionChange = this.onChange("region")
 
   onFetchReports = params => {
     const { user, onError } = this.props
