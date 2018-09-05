@@ -429,7 +429,7 @@ const updateTokens = (membershipId, cookieToken, accessToken, refreshToken) =>
 const getRegion = membershipId =>
   executeQuery("SELECT region FROM ninja WHERE ninja_id=$1", [
     membershipId
-  ]).then(result => result[0])
+  ]).then(result => result[0].region)
 
 const executeQuery = (query, params) => {
   const pool = new Pool()
