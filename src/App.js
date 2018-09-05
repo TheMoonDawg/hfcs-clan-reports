@@ -68,7 +68,11 @@ class App extends Component {
     return (
       <MuiThemeProvider theme={theme}>
         <BrowserRouter>
-          <AppLayout user={user} onLogOut={this.onLogOut}>
+          <AppLayout
+            user={user}
+            onLogOut={this.onLogOut}
+            onError={this.onError}
+          >
             <Route exact path="/" component={this.indexComponent} />
             <Route exact path="/search" component={this.searchComponent} />
             <Route exact path="/new" component={this.newReportComponent} />

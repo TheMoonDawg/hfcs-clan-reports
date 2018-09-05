@@ -30,7 +30,7 @@ const styles = ({ zIndex, spacing }) => ({
 
 class AppToolbar extends Component {
   render() {
-    const { classes, user, onLogOut } = this.props
+    const { classes, user, onLogOut, onError } = this.props
 
     return (
       <AppBar position="absolute" className={classes.appBar}>
@@ -42,7 +42,7 @@ class AppToolbar extends Component {
           {user ? (
             <AuthorizedUser user={user} onLogOut={onLogOut} />
           ) : (
-            <LoggedOut />
+            <LoggedOut onError={onError} />
           )}
         </Toolbar>
       </AppBar>

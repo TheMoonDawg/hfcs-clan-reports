@@ -108,6 +108,12 @@ app.get(["/", "/search", "/new", "/redirect"], (_request, response) => {
 // API
 // ---------------------------
 
+// Get Client Id
+app.get("/api/client_id", (_request, response) => {
+  response.statusCode = OK
+  response.send(clientId)
+})
+
 // Login
 app.get("/api/login", (request, response) => {
   const options = getAuthorizationRequestOptions(request.query.code)

@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import { withStyles } from "@material-ui/core/styles"
+import getClientId from "../requests/getClientId"
 
 const styles = ({ palette }) => ({
   link: {
@@ -8,18 +9,31 @@ const styles = ({ palette }) => ({
 })
 
 class LoggedOut extends Component {
+  state = {}
+
+  componentDidMount() {
+    const { onError } = this.props
+
+    if (!this.state.clientId) {
+      getClientId()
+        .then(clientId => this.setState({ clientId }))
+        .catch(onError)
+    }
+  }
+
   render() {
     const { classes } = this.props
-    // const clientId = 24432 // Test
-    const clientId = 21650 // Live
+    const { clientId } = this.state
+    const link = clientId
+      ? `https://www.bungie.net/en/OAuth/Authorize?client_id=${clientId}&response_type=code`
+      : ""
 
     return (
-      <a
-        className={classes.link}
-        href={`https://www.bungie.net/en/OAuth/Authorize?client_id=${clientId}&response_type=code`}
-      >
-        Log In
-      </a>
+      link && (
+        <a className={classes.link} href={link}>
+          Log In
+        </a>
+      )
     )
   }
 }
