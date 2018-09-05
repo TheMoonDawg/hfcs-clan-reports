@@ -95,7 +95,7 @@ class NewReport extends Component {
 
   getInitState = () => ({
     ...initState,
-    region: this.props.user ? this.props.user.region : "English"
+    region: this.props.user.region
   })
 
   onChange = key => event => this.setState({ [key]: event.target.value })
@@ -224,6 +224,7 @@ class NewReport extends Component {
                 {/* Judgment */}
                 <TextField
                   className={classnames(classes.margin, classes.textField200)}
+                  InputLabelProps={{ shrink: true }}
                   select
                   label="Judgment:"
                   disabled={!user}
@@ -313,6 +314,7 @@ class NewReport extends Component {
                 {/* Region */}
                 <TextField
                   className={classnames(classes.margin, classes.textField200)}
+                  InputLabelProps={{ shrink: true }}
                   select
                   label="Region:"
                   disabled={!user}

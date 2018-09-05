@@ -103,6 +103,7 @@ class Search extends Component {
 
             <TextField
               className={classes.textField}
+              InputLabelProps={{ shrink: true }}
               select
               label="Region:"
               disabled={!user}
