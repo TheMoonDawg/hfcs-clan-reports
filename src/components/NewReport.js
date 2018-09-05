@@ -86,6 +86,14 @@ class NewReport extends Component {
     region: this.props.user ? this.props.user.region : "English"
   }
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.user && prevState.region !== nextProps.user.region) {
+      return { region: nextProps.user.region }
+    }
+
+    return null
+  }
+
   getInitState = () => ({
     ...initState,
     region: this.props.user ? this.props.user.region : "English"

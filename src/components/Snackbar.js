@@ -18,6 +18,7 @@ class Snackbar extends PureComponent {
         open={open}
         message={message}
         autoHideDuration={5000}
+        disableWindowBlurListener
         onClose={this.onClose}
       />
     )

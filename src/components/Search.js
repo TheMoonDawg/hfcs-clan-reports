@@ -27,6 +27,14 @@ class Search extends Component {
     region: this.props.user ? this.props.user.region : "English"
   }
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.user && prevState.region !== nextProps.user.region) {
+      return { region: nextProps.user.region }
+    }
+
+    return null
+  }
+
   onChange = key => event => this.setState({ [key]: event.target.value })
   onIdChange = this.onChange("id")
   onNameChange = this.onChange("name")
