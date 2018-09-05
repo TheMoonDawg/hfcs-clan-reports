@@ -4,6 +4,7 @@ import Card from "@material-ui/core/Card"
 import CardActions from "@material-ui/core/CardActions"
 import CardContent from "@material-ui/core/CardContent"
 import CardHeader from "@material-ui/core/CardHeader"
+import MenuItem from "@material-ui/core/MenuItem"
 import TextField from "@material-ui/core/TextField"
 import { withStyles } from "@material-ui/core/styles"
 import getReports from "../requests/getReports"
@@ -22,7 +23,8 @@ const styles = ({ spacing }) => ({
 class Search extends Component {
   state = {
     id: "",
-    name: ""
+    name: "",
+    region: this.props.user ? this.props.user.region : "English"
   }
 
   onChange = key => event => this.setState({ [key]: event.target.value })
@@ -45,8 +47,14 @@ class Search extends Component {
     this.onFetchReports(params)
   }
 
-  onLast50Reports = () => {
-    const params = { last_50_reports: true }
+  onLast100Reports = () => {
+    const params = { last_100_reports: true }
+    this.onFetchReports(params)
+  }
+
+  onLast100RegionalReports = () => {
+    const { region } = this.state
+    const params = { region, last_100_regional_reports: true }
     this.onFetchReports(params)
   }
 
@@ -56,7 +64,7 @@ class Search extends Component {
   }
 
   render() {
-    const { id, name, results } = this.state
+    const { id, name, region, results } = this.state
     const { classes, user } = this.props
 
     return (
@@ -68,18 +76,38 @@ class Search extends Component {
               type="number"
               className={classes.textField}
               label="Clan Id:"
+              disabled={!user}
               value={id}
               onChange={this.onIdChange}
-              disabled={!user}
             />
+
             <br />
+
             <TextField
               className={classes.textField}
               label="Clan Name:"
+              disabled={!user}
               value={name}
               onChange={this.onNameChange}
-              disabled={!user}
             />
+
+            <br />
+
+            <TextField
+              className={classes.textField}
+              select
+              label="Region:"
+              disabled={!user}
+              value={region}
+              onChange={this.onRegionChange}
+            >
+              <MenuItem value="English">English</MenuItem>
+              <MenuItem value="French">French</MenuItem>
+              <MenuItem value="German">German</MenuItem>
+              <MenuItem value="Italian">Italian</MenuItem>
+              <MenuItem value="Portuguese">Portuguese</MenuItem>
+              <MenuItem value="Spanish">Spanish</MenuItem>
+            </TextField>
           </CardContent>
           <CardActions>
             <Button
@@ -92,10 +120,17 @@ class Search extends Component {
             </Button>
             <Button
               variant="outlined"
-              onClick={this.onLast50Reports}
+              onClick={this.onLast100Reports}
               disabled={!user}
             >
-              Last 50 Reports
+              Last 100 Reports
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={this.onLast100RegionalReports}
+              disabled={!user}
+            >
+              Last 100 Regional Reports
             </Button>
             <Button
               variant="outlined"

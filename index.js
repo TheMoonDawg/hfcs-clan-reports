@@ -129,6 +129,12 @@ app.get("/api/login", (request, response) => {
         refreshToken
       ).then(() => model)
     )
+    .then(model =>
+      getRegion(model.membershipId).then(region => ({
+        ...model,
+        region
+      }))
+    )
     .then(model => {
       response.statusCode = OK
       response.send(model)
@@ -178,6 +184,12 @@ app.get("/api/search", (request, response) => {
         values.push(queryString.clan_name)
       }
 
+      if (queryString.last_100_regional_reports) {
+        query += ` AND r.region=$${paramNum}`
+        paramNum++
+        values.push(queryString.region)
+      }
+
       if (queryString.user_100_reports) {
         query += ` AND r.ninja_id=$${paramNum}`
         paramNum++
@@ -186,11 +198,11 @@ app.get("/api/search", (request, response) => {
 
       query += " ORDER BY r.report_date DESC"
 
-      if (queryString.last_50_reports) {
-        query += " LIMIT 50"
-      }
-
-      if (queryString.user_100_reports) {
+      if (
+        queryString.last_100_reports ||
+        queryString.last_100_regional_reports ||
+        queryString.user_100_reports
+      ) {
         query += " LIMIT 100"
       }
 
@@ -262,8 +274,11 @@ app.post("/api/new", (request, response) => {
             .on("end", () => {
               const data = JSON.parse(body)
 
-              const query =
-                "INSERT INTO report(clan_id, clan_name, clan_motto, clan_mission_statement, notes, ninja_id, judgment, report_date) Values($1, $2, $3, $4, $5, $6, $7, NOW());"
+              const query = `
+                INSERT INTO report(clan_id, clan_name, clan_motto, clan_mission_statement, notes, ninja_id, judgment, region, report_date)
+                VALUES($1, $2, $3, $4, $5, $6, $7, $8, NOW());
+              `
+
               const params = [
                 data.id,
                 data.name,
@@ -271,7 +286,8 @@ app.post("/api/new", (request, response) => {
                 data.missionStatement,
                 data.notes,
                 user.membershipId,
-                data.judgment
+                data.judgment,
+                data.region
               ]
 
               resolve(executeQuery(query, params))
@@ -403,6 +419,11 @@ const updateTokens = (membershipId, cookieToken, accessToken, refreshToken) =>
 
     executeQuery(query, params)
   })
+
+const getRegion = membershipId =>
+  executeQuery("SELECT region FROM ninja WHERE ninja_id=$1", [
+    membershipId
+  ]).then(result => result[0])
 
 const executeQuery = (query, params) => {
   const pool = new Pool()

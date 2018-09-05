@@ -82,8 +82,14 @@ const initState = {
 
 class NewReport extends Component {
   state = {
-    ...initState
+    ...initState,
+    region: this.props.user ? this.props.user.region : "English"
   }
+
+  getInitState = () => ({
+    ...initState,
+    region: this.props.user ? this.props.user.region : "English"
+  })
 
   onChange = key => event => this.setState({ [key]: event.target.value })
   onJudgmentChange = this.onChange("judgment")
@@ -92,6 +98,7 @@ class NewReport extends Component {
   onMottoChange = this.onChange("motto")
   onMissionStatementChange = this.onChange("missionStatement")
   onNotesChange = this.onChange("notes")
+  onRegionChange = this.onChange("region")
   onParserClanIdChange = this.onChange("parserClanId")
 
   onFocus = () => this.setState({ parserQueue: "" })
@@ -108,7 +115,7 @@ class NewReport extends Component {
     const clanId = parseText(report, idMatch)
 
     this.setState({
-      ...initState,
+      ...this.getInitState(),
       id: clanId,
       name: parseText(report, nameMatch),
       motto: parseText(report, mottoMatch),
@@ -128,7 +135,7 @@ class NewReport extends Component {
 
     getClanData(user, parserClanId)
       .then(result => {
-        this.setState({ ...initState, ...result })
+        this.setState({ ...this.getInitState(), ...result })
         this.onFetchReports(result.id)
       })
       .catch(onError)
@@ -147,7 +154,15 @@ class NewReport extends Component {
   }
 
   onCreateReport = () => {
-    const { id, name, motto, missionStatement, notes, judgment } = this.state
+    const {
+      id,
+      name,
+      motto,
+      missionStatement,
+      notes,
+      judgment,
+      region
+    } = this.state
     const { user, onOpenSnackbar, onError } = this.props
 
     if (!id.trim() || !name.trim()) {
@@ -163,13 +178,14 @@ class NewReport extends Component {
       motto,
       missionStatement,
       notes,
-      judgment
+      judgment,
+      region
     }
 
     createReport(user, body)
       .then(() => {
         onOpenSnackbar("Report successfully added!")
-        this.setState(initState)
+        this.setState(this.getInitState())
       })
       .catch(onError)
   }
@@ -182,6 +198,7 @@ class NewReport extends Component {
       motto,
       missionStatement,
       notes,
+      region,
       parserClanId,
       parserQueue,
       required,
@@ -282,6 +299,25 @@ class NewReport extends Component {
                     onChange={this.onNotesChange}
                   />
                 </div>
+
+                <br />
+
+                {/* Region */}
+                <TextField
+                  className={classnames(classes.margin, classes.textField200)}
+                  select
+                  label="Region:"
+                  disabled={!user}
+                  value={region}
+                  onChange={this.onRegionChange}
+                >
+                  <MenuItem value="English">English</MenuItem>
+                  <MenuItem value="French">French</MenuItem>
+                  <MenuItem value="German">German</MenuItem>
+                  <MenuItem value="Italian">Italian</MenuItem>
+                  <MenuItem value="Portuguese">Portuguese</MenuItem>
+                  <MenuItem value="Spanish">Spanish</MenuItem>
+                </TextField>
               </div>
 
               <span className={classes.flex} />

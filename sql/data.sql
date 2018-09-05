@@ -83,3 +83,9 @@ WHERE ninja_id = 4864368 OR ninja_id = 924570;
 UPDATE ninja
 SET region = 'Portuguese'
 WHERE ninja_id = 8878733;
+
+-- Update regions for existing reports
+UPDATE report r
+SET region = n.region
+FROM ninja n
+WHERE n.ninja_id = r.ninja_id;

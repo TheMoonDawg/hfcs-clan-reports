@@ -26,6 +26,10 @@ CREATE TABLE token
     cookie_token TEXT NOT NULL
 );
 
--- Add region column
+-- Add region column to ninja
 ALTER TABLE ninja
+ADD COLUMN region TEXT NOT NULL DEFAULT 'English';
+
+-- Add region column to report
+ALTER TABLE report
 ADD COLUMN region TEXT NOT NULL DEFAULT 'English';
