@@ -7,7 +7,8 @@
 /coverage
 
 # production
-/build
+# Include build for now so dyno doesn't recreate on every spin down
+# /build
 
 # misc
 .DS_Store
