@@ -45,7 +45,7 @@ class AppToolbar extends Component {
         <Toolbar className={classes.toolbar}>
           {isDesktop(width) ? (
             <Typography variant="title" color="inherit">
-              HFCS Clan Reports YEE
+              HFCS Clan Reports
             </Typography>
           ) : (
             <IconButton className={classes.iconButton} onClick={toggleDrawer}>
@@ -54,7 +54,6 @@ class AppToolbar extends Component {
           )}
 
           <span className={classes.flex} />
-          <p>flex?</p>
 
           {user ? (
             <AuthorizedUser user={user} onLogOut={onLogOut} />
