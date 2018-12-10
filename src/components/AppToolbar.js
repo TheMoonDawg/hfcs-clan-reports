@@ -49,9 +49,15 @@ class AppToolbar extends Component {
               <MenuIcon />
             </IconButton>
           )}
-          <Typography className={classes.flex} variant="title" color="inherit">
-            HFCS Clan Reports
-          </Typography>
+          {isDesktop(width) && (
+            <Typography
+              className={classes.flex}
+              variant="title"
+              color="inherit"
+            >
+              HFCS Clan Reports
+            </Typography>
+          )}
 
           {user ? (
             <AuthorizedUser user={user} onLogOut={onLogOut} />
