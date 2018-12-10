@@ -1,5 +1,5 @@
-import classnames from "classnames"
 import React, { Component } from "react"
+
 import Button from "@material-ui/core/Button"
 import Card from "@material-ui/core/Card"
 import CardActions from "@material-ui/core/CardActions"
@@ -8,13 +8,14 @@ import CardHeader from "@material-ui/core/CardHeader"
 import Icon from "@material-ui/core/Icon"
 import IconButton from "@material-ui/core/IconButton"
 import MenuItem from "@material-ui/core/MenuItem"
+import SearchResults from "./SearchResults"
 import TextField from "@material-ui/core/TextField"
 import Tooltip from "@material-ui/core/Tooltip"
-import { withStyles } from "@material-ui/core/styles"
+import classnames from "classnames"
 import createReport from "../requests/createReport"
 import getClanData from "../requests/getClanData"
 import getReports from "../requests/getReports"
-import SearchResults from "./SearchResults"
+import { withStyles } from "@material-ui/core/styles"
 
 const placeholderText =
   "Ex:\nClan Reported:\nCLAN NAME (id: 123456)\n\nClan Motto:\nCLAN MOTTO\n\nClan Mission Statement:\nCLAN MISSION STATEMENT"
@@ -24,47 +25,49 @@ const parseText = (report, regex) => {
   return value ? value[1] : ""
 }
 
-const styles = ({ spacing, palette }) => ({
+const styles = ({ spacing, palette, breakpoints }) => ({
   card: {
-    marginBottom: spacing.unit * 3
+    marginBottom: spacing.unit * 3,
   },
   container: {
-    display: "flex"
+    display: "flex",
+    [breakpoints.down("md")]: { display: "block" },
+  },
+  reportContainer: {
+    flex: 2,
+    maxWidth: 600,
   },
   flex: {
-    flex: 1
+    flex: 1,
   },
   margin: {
-    marginBottom: spacing.unit
+    marginBottom: spacing.unit,
   },
   textField200: {
-    width: 200
+    maxWidth: 200,
   },
   textField400: {
-    width: 400
-  },
-  textField600: {
-    width: 600
+    maxWidth: 400,
   },
   textBoxContainer: {
     background: palette.secondary.main,
     borderRadius: 4,
-    padding: spacing.unit
+    padding: spacing.unit,
   },
   parserContainer: {
-    width: 250
+    width: 250,
   },
   textFieldParser: {
-    width: "100%"
+    width: "100%",
   },
   parserClanIdContainer: {
     display: "flex",
-    alignItems: "center"
+    alignItems: "center",
   },
   iconButton: {
     width: spacing.unit * 4,
-    height: spacing.unit * 4
-  }
+    height: spacing.unit * 4,
+  },
 })
 
 const initState = {
@@ -77,12 +80,12 @@ const initState = {
   parserClanId: "",
   parserQueue: placeholderText,
   required: false,
-  results: null
+  results: null,
 }
 
 class NewReport extends Component {
   state = {
-    ...initState
+    ...initState,
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -95,7 +98,7 @@ class NewReport extends Component {
 
   getInitState = () => ({
     ...initState,
-    region: this.props.user.region
+    region: this.props.user.region,
   })
 
   onChange = key => event => this.setState({ [key]: event.target.value })
@@ -126,7 +129,7 @@ class NewReport extends Component {
       id: clanId,
       name: parseText(report, nameMatch),
       motto: parseText(report, mottoMatch),
-      missionStatement: parseText(report, statementMatch)
+      missionStatement: parseText(report, statementMatch),
     })
 
     this.inputRef.blur()
@@ -168,7 +171,7 @@ class NewReport extends Component {
       missionStatement,
       notes,
       judgment,
-      region
+      region,
     } = this.state
     const { user, onOpenSnackbar, onError } = this.props
 
@@ -186,7 +189,7 @@ class NewReport extends Component {
       missionStatement,
       notes,
       judgment,
-      region
+      region,
     }
 
     createReport(user, body)
@@ -209,7 +212,7 @@ class NewReport extends Component {
       parserClanId,
       parserQueue,
       required,
-      results
+      results,
     } = this.state
     const { classes, user } = this.props
     const userName = user ? user.name : null
@@ -220,10 +223,11 @@ class NewReport extends Component {
           <CardHeader title={userName} />
           <CardContent>
             <div className={classes.container}>
-              <div>
+              <div className={classes.reportContainer}>
                 {/* Judgment */}
                 <TextField
                   className={classnames(classes.margin, classes.textField200)}
+                  fullWidth
                   InputLabelProps={{ shrink: true }}
                   select
                   label="Judgment:"
@@ -243,6 +247,7 @@ class NewReport extends Component {
                 <TextField
                   type="number"
                   className={classnames(classes.margin, classes.textField200)}
+                  fullWidth
                   label="Clan Id:"
                   required={required}
                   error={required}
@@ -257,6 +262,7 @@ class NewReport extends Component {
                 {/* Clan Name */}
                 <TextField
                   className={classnames(classes.margin, classes.textField400)}
+                  fullWidth
                   label="Clan Name:"
                   required={required}
                   error={required}
@@ -270,6 +276,7 @@ class NewReport extends Component {
                 {/* Clan Motto */}
                 <TextField
                   className={classnames(classes.margin, classes.textField400)}
+                  fullWidth
                   label="Clan Motto:"
                   disabled={!user}
                   value={motto}
@@ -282,11 +289,11 @@ class NewReport extends Component {
                 <div
                   className={classnames(
                     classes.margin,
-                    classes.textBoxContainer
+                    classes.textBoxContainer,
                   )}
                 >
                   <TextField
-                    className={classes.textField600}
+                    fullWidth
                     multiline
                     rowsMax={6}
                     label="Clan Mission Statement:"
@@ -299,7 +306,7 @@ class NewReport extends Component {
                 {/* Notes */}
                 <div className={classes.textBoxContainer}>
                   <TextField
-                    className={classes.textField600}
+                    fullWidth
                     multiline
                     rowsMax={6}
                     label="Notes:"
@@ -314,6 +321,7 @@ class NewReport extends Component {
                 {/* Region */}
                 <TextField
                   className={classnames(classes.margin, classes.textField200)}
+                  fullWidth
                   InputLabelProps={{ shrink: true }}
                   select
                   label="Region:"
@@ -340,7 +348,7 @@ class NewReport extends Component {
                     type="number"
                     className={classnames(
                       classes.margin,
-                      classes.textFieldParser
+                      classes.textFieldParser,
                     )}
                     label="Parser (Clan Id):"
                     disabled={!user}
@@ -378,7 +386,7 @@ class NewReport extends Component {
                     rows={9}
                     value={parserQueue}
                     InputLabelProps={{
-                      shrink: true
+                      shrink: true,
                     }}
                     disabled={!user}
                     onFocus={this.onFocus}

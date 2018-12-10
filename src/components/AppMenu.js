@@ -1,37 +1,41 @@
 import React, { Component } from "react"
-import { Link } from "react-router-dom"
+
 import Divider from "@material-ui/core/Divider"
 import Drawer from "@material-ui/core/Drawer"
 import Fade from "@material-ui/core/Fade"
 import Icon from "@material-ui/core/Icon"
+import { Link } from "react-router-dom"
 import List from "@material-ui/core/List"
 import ListItem from "@material-ui/core/ListItem"
 import ListItemIcon from "@material-ui/core/ListItemIcon"
 import ListItemText from "@material-ui/core/ListItemText"
 import Typography from "@material-ui/core/Typography"
-import { withStyles } from "@material-ui/core/styles"
 import background from "../images/background.jpg"
+import { compose } from "recompose"
+import isDesktop from "../utils/isDesktop"
+import { withStyles } from "@material-ui/core/styles"
+import withWidth from "@material-ui/core/withWidth"
 
 const drawerWidth = 240
 
 const styles = ({ mixins, spacing, palette }) => ({
   drawerPaper: {
     position: "relative",
-    width: drawerWidth
+    width: drawerWidth,
   },
   toolbar: mixins.toolbar,
   link: {
     textDecoration: "none",
-    color: "inherit"
+    color: "inherit",
   },
   container: {
     display: "flex",
     flexDirection: "column",
-    height: "100%"
+    height: "100%",
   },
   resourcesLabel: {
     marginLeft: spacing.unit,
-    marginBottom: spacing.unit * 3
+    marginBottom: spacing.unit * 3,
   },
   resourcesContainer: {
     marginLeft: spacing.unit,
@@ -40,34 +44,38 @@ const styles = ({ mixins, spacing, palette }) => ({
       display: "block",
       color: palette.common.white,
       textDecoration: "none",
-      marginBottom: spacing.unit
-    }
+      marginBottom: spacing.unit,
+    },
   },
   flex: {
-    flex: 1
-  }
+    flex: 1,
+  },
 })
 
 class AppMenu extends Component {
   state = {
-    renderImage: false
+    renderImage: false,
   }
 
   renderImage = () => this.setState({ renderImage: true })
 
   render() {
     const { renderImage } = this.state
-    const { classes, user } = this.props
+    const { classes, user, width, drawerOpen, toggleDrawer } = this.props
     const resources = user ? { __html: user.resources } : null
+    const desktopMode = isDesktop(width)
+    const drawerVariant = desktopMode ? "permanent" : "temporary"
 
     return (
       <Drawer
-        variant="permanent"
+        open={drawerOpen}
+        onClose={toggleDrawer}
+        variant={drawerVariant}
         classes={{
-          paper: classes.drawerPaper
+          paper: classes.drawerPaper,
         }}
       >
-        <div className={classes.toolbar} />
+        {desktopMode && <div className={classes.toolbar} />}
         <List>
           <Link className={classes.link} to="/search">
             <ListItem button>
@@ -110,4 +118,7 @@ class AppMenu extends Component {
   }
 }
 
-export default withStyles(styles)(AppMenu)
+export default compose(
+  withWidth(),
+  withStyles(styles),
+)(AppMenu)

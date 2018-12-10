@@ -1,29 +1,37 @@
 import React, { Component } from "react"
+
 import Button from "@material-ui/core/Button"
 import Card from "@material-ui/core/Card"
 import CardActions from "@material-ui/core/CardActions"
 import CardContent from "@material-ui/core/CardContent"
 import CardHeader from "@material-ui/core/CardHeader"
 import MenuItem from "@material-ui/core/MenuItem"
-import TextField from "@material-ui/core/TextField"
-import { withStyles } from "@material-ui/core/styles"
-import getReports from "../requests/getReports"
 import SearchResults from "./SearchResults"
+import TextField from "@material-ui/core/TextField"
+import getReports from "../requests/getReports"
+import { withStyles } from "@material-ui/core/styles"
 
 const styles = ({ spacing }) => ({
   card: {
-    marginBottom: spacing.unit * 3
+    marginBottom: spacing.unit * 3,
   },
   textField: {
     width: 200,
-    marginBottom: spacing.unit
-  }
+    marginBottom: spacing.unit,
+  },
+  buttonContainer: {
+    display: "flex",
+    flexWrap: "wrap",
+  },
+  button: {
+    margin: spacing.unit / 2,
+  },
 })
 
 class Search extends Component {
   state = {
     id: "",
-    name: ""
+    name: "",
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -119,35 +127,41 @@ class Search extends Component {
             </TextField>
           </CardContent>
           <CardActions>
-            <Button
-              variant="raised"
-              color="primary"
-              onClick={this.onSearch}
-              disabled={!user || (!id.trim() && !name.trim())}
-            >
-              Search
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={this.onLast100Reports}
-              disabled={!user}
-            >
-              Last 100 Reports
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={this.onLast100RegionalReports}
-              disabled={!user}
-            >
-              Last 100 Regional Reports
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={this.onUserLast100Reports}
-              disabled={!user}
-            >
-              Your Last 100 Reports
-            </Button>
+            <div className={classes.buttonContainer}>
+              <Button
+                className={classes.button}
+                variant="raised"
+                color="primary"
+                onClick={this.onSearch}
+                disabled={!user || (!id.trim() && !name.trim())}
+              >
+                Search
+              </Button>
+              <Button
+                className={classes.button}
+                variant="outlined"
+                onClick={this.onLast100Reports}
+                disabled={!user}
+              >
+                Last 100 Reports
+              </Button>
+              <Button
+                className={classes.button}
+                variant="outlined"
+                onClick={this.onLast100RegionalReports}
+                disabled={!user}
+              >
+                Last 100 Regional Reports
+              </Button>
+              <Button
+                className={classes.button}
+                variant="outlined"
+                onClick={this.onUserLast100Reports}
+                disabled={!user}
+              >
+                Your Last 100 Reports
+              </Button>
+            </div>
           </CardActions>
         </Card>
 
