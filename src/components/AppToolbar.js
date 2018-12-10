@@ -16,15 +16,14 @@ const styles = ({ zIndex, spacing }) => ({
   appBar: {
     zIndex: zIndex.drawer + 1,
   },
-  container: {
-    display: "block",
-    textAlign: "right",
-  },
-  iconButton: {
-    marginRight: spacing.unit,
+  toolbar: {
+    display: "flex",
   },
   flex: {
     flex: 1,
+  },
+  iconButton: {
+    marginRight: spacing.unit,
   },
   logOut: {
     cursor: "pointer",
@@ -43,16 +42,15 @@ class AppToolbar extends Component {
 
     return (
       <AppBar position="absolute" className={classes.appBar}>
-        <Toolbar>
-          {!isDesktop(width) && (
-            <IconButton className={classes.iconButton} onClick={toggleDrawer}>
-              <MenuIcon />
-            </IconButton>
-          )}
-          {isDesktop(width) && (
+        <Toolbar className={classes.toolbar}>
+          {isDesktop(width) ? (
             <Typography variant="title" color="inherit">
               HFCS Clan Reports
             </Typography>
+          ) : (
+            <IconButton className={classes.iconButton} onClick={toggleDrawer}>
+              <MenuIcon />
+            </IconButton>
           )}
 
           <span className={classes.flex} />
