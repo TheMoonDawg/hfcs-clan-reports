@@ -175,8 +175,9 @@ app.get("/api/test/reports", (request, response) => {
       const options = getTESTReports(accessToken)
       return requestPromise(options)
     })
-    .catch(({ statusCode }) => {
-      throw statusCode
+    .catch(err => {
+      console.log(err)
+      throw err.statusCode
     })
     .then(response => {
       return JSON.parse(response)
