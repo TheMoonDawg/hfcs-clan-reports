@@ -1,37 +1,37 @@
 import React, { Component } from "react"
-
 import Button from "@material-ui/core/Button"
 import Card from "@material-ui/core/Card"
 import CardActions from "@material-ui/core/CardActions"
 import CardContent from "@material-ui/core/CardContent"
 import CardHeader from "@material-ui/core/CardHeader"
 import MenuItem from "@material-ui/core/MenuItem"
-import SearchResults from "./SearchResults"
 import TextField from "@material-ui/core/TextField"
-import getReports from "../requests/getReports"
 import { withStyles } from "@material-ui/core/styles"
+import getReports from "../requests/getReports"
+import getTestReports from "../requests/getTestReports"
+import SearchResults from "./SearchResults"
 
 const styles = ({ spacing }) => ({
   card: {
-    marginBottom: spacing.unit * 3,
+    marginBottom: spacing.unit * 3
   },
   textField: {
     width: 200,
-    marginBottom: spacing.unit,
+    marginBottom: spacing.unit
   },
   buttonContainer: {
     display: "flex",
-    flexWrap: "wrap",
+    flexWrap: "wrap"
   },
   button: {
-    margin: spacing.unit / 2,
-  },
+    margin: spacing.unit / 2
+  }
 })
 
 class Search extends Component {
   state = {
     id: "",
-    name: "",
+    name: ""
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -77,6 +77,11 @@ class Search extends Component {
   onUserLast100Reports = () => {
     const params = { user_100_reports: true }
     this.onFetchReports(params)
+  }
+
+  onTestReports = () => {
+    const { user } = this.props
+    getTestReports(user)
   }
 
   render() {
@@ -160,6 +165,15 @@ class Search extends Component {
                 disabled={!user}
               >
                 Your Last 100 Reports
+              </Button>
+
+              <Button
+                className={classes.button}
+                variant="outlined"
+                onClick={this.onTestReports}
+                disabled={!user}
+              >
+                GET TEST REPORTS
               </Button>
             </div>
           </CardActions>

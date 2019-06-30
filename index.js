@@ -51,6 +51,15 @@ const getRefreshRequestOptions = refreshToken => ({
   body: `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`
 })
 
+const getTESTReports = accessToken => ({
+  url: "https://www.bungie.net/Platform/Admin/Assigned/",
+  method: "POST",
+  headers: {
+    "X-API-Key": apiKey,
+    Authorization: `Bearer ${accessToken}`
+  }
+})
+
 const getUserRequestOptions = accessToken => ({
   url: "https://www.bungie.net/Platform/User/GetCurrentBungieAccount/",
   method: "GET",
@@ -151,6 +160,41 @@ app.get("/api/login", (request, response) => {
       response.end()
     })
 })
+
+// -----------------------------------
+// TEST API
+// -----------------------------------
+
+// Get TEST reports
+app.get("/api/test/reports", (request, response) => {
+  const token = getAuthToken(request)
+
+  getAccessTokens(token)
+    .then(data => checkNinja(token, data.access_token, data.refresh_token))
+    .then(({ accessToken }) => {
+      const options = getTESTReports(accessToken)
+      return requestPromise(options)
+    })
+    .catch(({ statusCode }) => {
+      throw statusCode
+    })
+    .then(response => {
+      return JSON.parse(response)
+    })
+    .then(data => {
+      response.statusCode = OK
+      response.send(data)
+    })
+    .catch(statusCode => {
+      response.statusCode = statusCode
+      response.statusMessage = getErrorMessage(statusCode)
+      response.end()
+    })
+})
+
+// -----------------------------------
+// END TEST API
+// -----------------------------------
 
 // Search Clan Reports
 app.get("/api/search", (request, response) => {
