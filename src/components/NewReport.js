@@ -333,6 +333,7 @@ class NewReport extends Component {
                   <MenuItem value="French">French</MenuItem>
                   <MenuItem value="German">German</MenuItem>
                   <MenuItem value="Italian">Italian</MenuItem>
+                  <MenuItem value="Polish">Polish</MenuItem>
                   <MenuItem value="Portuguese">Portuguese</MenuItem>
                   <MenuItem value="Spanish">Spanish</MenuItem>
                 </TextField>
