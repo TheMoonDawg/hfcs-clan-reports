@@ -441,7 +441,12 @@ const getRegion = membershipId =>
 const executeQuery = (query, params) => {
   console.log('executing query')
 
-  const pool = new Pool({ connectionString, ssl: true })
+  const pool = new Pool({
+    connectionString,
+    ssl: {
+      rejectUnauthorized: false
+    }
+  })
 
   return pool
     .query(query, params)
