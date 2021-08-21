@@ -91,8 +91,6 @@ app.get(["/", "/search", "/new", "/redirect"], (_request, response) => {
 
 // Get Client Id
 app.get("/api/client_id", (_request, response) => {
-  console.log(clientId)
-
   response.statusCode = OK
   response.send(clientId)
 })
@@ -102,23 +100,14 @@ app.get("/api/login", (request, response) => {
   const options = getAuthorizationRequestOptions(request.query.code)
   const cookieToken = uuidv4()
 
-  console.log('Logging user in')
-  console.log(options)
-  console.log(request.query)
-
   fetch('https://www.bungie.net/platform/app/oauth/token/', options)
     .catch(({ statusCode }) => {
       throw statusCode
     })
     .then(data => {
-      console.log('Checking cookie...')
-      console.log(data)
-
       return checkNinja(cookieToken, data.access_token, data.refresh_token)
     })
     .then(({ accessToken, refreshToken, ...model }) => {
-      console.log('Updating tokens...')
-
       return updateTokens(
         model.membershipId,
         model.cookieToken,
@@ -128,8 +117,6 @@ app.get("/api/login", (request, response) => {
     }
     )
     .then(model => {
-      console.log('Getting region for', model.membershipId)
-
       return getRegion(model.membershipId).then(region => ({
         ...model,
         region
@@ -141,8 +128,6 @@ app.get("/api/login", (request, response) => {
       response.send(model)
     })
     .catch(statusCode => {
-      console.log('failed!!!', statusCode)
-
       response.statusCode = statusCode
       response.statusMessage = getErrorMessage(statusCode)
       response.end()
@@ -316,8 +301,6 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
     getUser(accessToken)
       // Valid Access Token
       .then(data => {
-        console.log('WE GOT DATA', data)
-
         const user = data.Response.bungieNetUser
 
         model = generateModel(user, cookieToken, accessToken, refreshToken)
@@ -330,13 +313,9 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
           fetch('https://www.bungie.net/platform/app/oauth/token/', options)
             // Invalid Refresh Token
             .catch(({ statusCode }) => {
-              console.log('WE FAIOED', statusCode)
-
               throw statusCode
             })
             .then(data => {
-              console.log('success!!', data)
-
               return (
                 getUser(data.access_token)
                   // New Access Token also invalid
@@ -367,8 +346,6 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
       })
       // Check Authorized Ninja
       .then(() => {
-        console.log('checking authorized')
-
         return executeQuery(
           "SELECT display_name FROM ninja WHERE ninja_id = $1 AND active",
           [model.membershipId]
@@ -439,8 +416,6 @@ const getRegion = membershipId =>
   ]).then(result => result[0].region)
 
 const executeQuery = (query, params) => {
-  console.log('executing query')
-
   const pool = new Pool({
     connectionString,
     ssl: {
@@ -451,11 +426,10 @@ const executeQuery = (query, params) => {
   return pool
     .query(query, params)
     .then(res => {
-      console.log('...done!', res)
       return res.rows
     })
     .catch(err => {
-      console.log(err)
+      console.error(err)
       throw SERVER_ERROR
     })
 }
