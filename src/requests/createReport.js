@@ -1,4 +1,5 @@
 import generateAuthHeader from "../utils/generateAuthHeader"
+import Error from "../utils/Error"
 
 export default ({ cookieToken }, body) => {
   const options = {
@@ -10,7 +11,7 @@ export default ({ cookieToken }, body) => {
     }
   }
 
-  return fetch(`../api/new`, options).then(({ status, statusText }) => {
-    if (status !== 200) throw { status, statusText }
+  return fetch(`../api/new`, options).then((result) => {
+    if (result.status !== 200) { throw new Error(result) }
   })
 }

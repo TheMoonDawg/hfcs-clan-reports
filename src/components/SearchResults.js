@@ -1,4 +1,5 @@
-import moment from "moment"
+import { format, parseISO } from "date-fns/fp"
+import { flow } from "lodash"
 import React, { Component } from "react"
 import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
@@ -53,7 +54,7 @@ class SearchResults extends Component {
               {results.map(row => (
                 <TableRow key={row.id}>
                   <TableCell padding="dense">
-                    {moment(row.reportDate).format("MM/DD/YYYY hh:mm A")}
+                    {flow(parseISO, format('Pp'))(row.reportDate)}
                   </TableCell>
                   <TableCell padding="dense">{row.clanName}</TableCell>
                   <TableCell padding="dense">{row.clanMotto}</TableCell>
