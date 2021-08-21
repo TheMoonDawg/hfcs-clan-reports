@@ -318,6 +318,9 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
     getUser(accessToken)
       // Valid Access Token
       .then(response => {
+        console.log(response)
+        console.log(response.json())
+
         const user = response.json().Response.bungieNetUser
         model = generateModel(user, cookieToken, accessToken, refreshToken)
       })
