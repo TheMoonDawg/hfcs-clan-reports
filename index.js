@@ -119,27 +119,37 @@ app.get("/api/login", (request, response) => {
   const options = getAuthorizationRequestOptions(request.query.code)
   const cookieToken = uuidv4()
 
+  console.log('Logging user in')
+
   requestPromise(options)
     .catch(({ statusCode }) => {
       throw statusCode
     })
     .then(response => {
+      console.log('Checking cookie...')
+
       const json = JSON.parse(response)
       return checkNinja(cookieToken, json.access_token, json.refresh_token)
     })
-    .then(({ accessToken, refreshToken, ...model }) =>
-      updateTokens(
+    .then(({ accessToken, refreshToken, ...model }) => {
+      console.log('Updating tokens...')
+
+      return updateTokens(
         model.membershipId,
         model.cookieToken,
         accessToken,
         refreshToken
       ).then(() => model)
+    }
     )
-    .then(model =>
-      getRegion(model.membershipId).then(region => ({
+    .then(model => {
+      console.log('Getting region for', model.membershipId)
+
+      return getRegion(model.membershipId).then(region => ({
         ...model,
         region
       }))
+    }
     )
     .then(model => {
       response.statusCode = OK
