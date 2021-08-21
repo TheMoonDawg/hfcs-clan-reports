@@ -2,7 +2,7 @@
 const express = require("express")
 const nodeFetch = require("node-fetch")
 const path = require("path")
-const csParse = require("pg-connection-string").parse
+// const csParse = require("pg-connection-string").parse
 const { Pool } = require("pg")
 const uuidv4 = require("uuid/v4")
 const app = express()
@@ -22,13 +22,14 @@ const resources = process.env.RESOURCES || bungieConfig.resources
 
 // DB Connection
 const connectionString = process.env.DATABASE_URL || bungieConfig.database_url
-const dbConfig = csParse(connectionString)
-process.env.PGHOST = dbConfig.host
-process.env.PGUSER = dbConfig.user
-process.env.PGDATABASE = dbConfig.database
-process.env.PGPASSWORD = dbConfig.password
-process.env.PGPORT = dbConfig.port
-process.env.PGSSLMODE = "require"
+// const dbConfig = csParse(connectionString)
+// console.log(dbConfig)
+// process.env.PGHOST = dbConfig.host
+// process.env.PGUSER = dbConfig.user
+// process.env.PGDATABASE = dbConfig.database
+// process.env.PGPASSWORD = dbConfig.password
+// process.env.PGPORT = dbConfig.port
+// process.env.PGSSLMODE = "require"
 
 const fetch = (url, options) => nodeFetch(url, options).then(response => response.json())
 
@@ -450,7 +451,7 @@ const getRegion = membershipId =>
 const executeQuery = (query, params) => {
   console.log('executing query')
 
-  const pool = new Pool()
+  const pool = new Pool({ connectionString })
 
   return pool
     .query(query, params)
