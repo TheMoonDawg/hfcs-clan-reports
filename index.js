@@ -1,6 +1,6 @@
 // Imports
 const express = require("express")
-const fetch = require("node-fetch")
+const nodeFetch = require("node-fetch")
 const path = require("path")
 const csParse = require("pg-connection-string").parse
 const { Pool } = require("pg")
@@ -29,6 +29,8 @@ process.env.PGDATABASE = dbConfig.database
 process.env.PGPASSWORD = dbConfig.password
 process.env.PGPORT = dbConfig.port
 process.env.PGSSLMODE = "require"
+
+const fetch = (url, options) => nodeFetch(url, options).then(response => response.json())
 
 // Request Options
 const getAuthorizationRequestOptions = code => ({
@@ -98,6 +100,8 @@ app.get(["/", "/search", "/new", "/redirect"], (_request, response) => {
 
 // Get Client Id
 app.get("/api/client_id", (_request, response) => {
+  console.log(clientId)
+
   response.statusCode = OK
   response.send(clientId)
 })
@@ -108,16 +112,19 @@ app.get("/api/login", (request, response) => {
   const cookieToken = uuidv4()
 
   console.log('Logging user in')
+  console.log(options)
+  console.log(request.query)
 
   fetch('https://www.bungie.net/platform/app/oauth/token/', options)
     .catch(({ statusCode }) => {
+      console.log('failed!!!', statusCode)
       throw statusCode
     })
-    .then(response => {
+    .then(data => {
       console.log('Checking cookie...')
+      console.log(data)
 
-      const json = response.json()
-      return checkNinja(cookieToken, json.access_token, json.refresh_token)
+      return checkNinja(cookieToken, data.access_token, data.refresh_token)
     })
     .then(({ accessToken, refreshToken, ...model }) => {
       console.log('Updating tokens...')
@@ -144,6 +151,8 @@ app.get("/api/login", (request, response) => {
       response.send(model)
     })
     .catch(statusCode => {
+      console.log('failed!!!', statusCode)
+
       response.statusCode = statusCode
       response.statusMessage = getErrorMessage(statusCode)
       response.end()
@@ -238,12 +247,11 @@ app.get("/api/clan", (request, response) => {
     .catch(({ statusCode }) => {
       throw statusCode
     })
-    .then(response => {
-      const jsonResponse = response.json()
+    .then(data => {
+      if (data.ErrorStatus === "GroupNotFound") throw NOT_FOUND
 
-      if (jsonResponse.ErrorStatus === "GroupNotFound") throw NOT_FOUND
+      const clan = data.Response.detail
 
-      const clan = jsonResponse.Response.detail
       return {
         id: clan.groupId,
         name: clan.name,
@@ -317,11 +325,11 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
   return (
     getUser(accessToken)
       // Valid Access Token
-      .then(response => {
-        console.log(response)
-        console.log(response.json())
+      .then(data => {
+        console.log('WE GOT DATA', data)
 
-        const user = response.json().Response.bungieNetUser
+        const user = data.Response.bungieNetUser
+
         model = generateModel(user, cookieToken, accessToken, refreshToken)
       })
       // Invalid Access Token - Use Refresh Token
@@ -332,32 +340,34 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
           fetch('https://www.bungie.net/platform/app/oauth/token/', options)
             // Invalid Refresh Token
             .catch(({ statusCode }) => {
+              console.log('WE FAIOED', statusCode)
+
               throw statusCode
             })
-            .then(response => {
-              const tokens = response.json()
+            .then(data => {
+              console.log('success!!', data)
 
               return (
-                getUser(tokens.access_token)
+                getUser(data.access_token)
                   // New Access Token also invalid
                   .catch(({ statusCode }) => {
                     throw statusCode
                   })
-                  .then(response => {
-                    const user = response.json().Response.bungieNetUser
+                  .then(data => {
+                    const user = data.Response.bungieNetUser
 
                     // Update tokens in DB
                     return updateTokens(
                       user.membershipId,
                       cookieToken,
-                      tokens.access_token,
-                      tokens.refresh_token
+                      data.access_token,
+                      data.refresh_token
                     ).then(() => {
                       model = generateModel(
                         user,
                         cookieToken,
-                        tokens.access_token,
-                        tokens.refresh_token
+                        data.access_token,
+                        data.refresh_token
                       )
                     })
                   })
