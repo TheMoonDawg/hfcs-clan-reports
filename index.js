@@ -29,7 +29,7 @@ const connectionString = process.env.DATABASE_URL || bungieConfig.database_url
 // process.env.PGDATABASE = dbConfig.database
 // process.env.PGPASSWORD = dbConfig.password
 // process.env.PGPORT = dbConfig.port
-// process.env.PGSSLMODE = "require"
+process.env.PGSSLMODE = "require"
 
 const fetch = (url, options) => nodeFetch(url, options).then(response => response.json())
 
