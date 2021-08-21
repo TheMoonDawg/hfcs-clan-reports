@@ -19,17 +19,7 @@ const apiKey = process.env.X_API_KEY || bungieConfig.x_api_key
 const clientId = process.env.CLIENT_ID || bungieConfig.client_id
 const clientSecret = process.env.CLIENT_SECRET || bungieConfig.client_secret
 const resources = process.env.RESOURCES || bungieConfig.resources
-
-// DB Connection
 const connectionString = process.env.DATABASE_URL || bungieConfig.database_url
-// const dbConfig = csParse(connectionString)
-// console.log(dbConfig)
-// process.env.PGHOST = dbConfig.host
-// process.env.PGUSER = dbConfig.user
-// process.env.PGDATABASE = dbConfig.database
-// process.env.PGPASSWORD = dbConfig.password
-// process.env.PGPORT = dbConfig.port
-process.env.PGSSLMODE = "require"
 
 const fetch = (url, options) => nodeFetch(url, options).then(response => response.json())
 
@@ -451,7 +441,7 @@ const getRegion = membershipId =>
 const executeQuery = (query, params) => {
   console.log('executing query')
 
-  const pool = new Pool({ connectionString })
+  const pool = new Pool({ connectionString, ssl: true })
 
   return pool
     .query(query, params)
