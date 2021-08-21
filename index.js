@@ -117,7 +117,6 @@ app.get("/api/login", (request, response) => {
 
   fetch('https://www.bungie.net/platform/app/oauth/token/', options)
     .catch(({ statusCode }) => {
-      console.log('failed!!!', statusCode)
       throw statusCode
     })
     .then(data => {
@@ -376,11 +375,14 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
         )
       })
       // Check Authorized Ninja
-      .then(() =>
-        executeQuery(
+      .then(() => {
+        console.log('checking authorized')
+
+        return executeQuery(
           "SELECT display_name FROM ninja WHERE ninja_id = $1 AND active",
           [model.membershipId]
         )
+      }
       )
       .then(result => {
         if (result.length == 0) throw UNAUTHORIZED
@@ -446,11 +448,16 @@ const getRegion = membershipId =>
   ]).then(result => result[0].region)
 
 const executeQuery = (query, params) => {
+  console.log('executing query')
+
   const pool = new Pool()
 
   return pool
     .query(query, params)
-    .then(res => res.rows)
+    .then(res => {
+      console.log('...done!', res)
+      return res.rows
+    })
     .catch(err => {
       console.log(err)
       throw SERVER_ERROR
