@@ -1,6 +1,6 @@
 // Imports
 const express = require("express")
-const requestPromise = require("request-promise")
+const fetch = require("node-fetch")
 const path = require("path")
 const csParse = require("pg-connection-string").parse
 const { Pool } = require("pg")
@@ -32,7 +32,6 @@ process.env.PGSSLMODE = "require"
 
 // Request Options
 const getAuthorizationRequestOptions = code => ({
-  url: "https://www.bungie.net/platform/app/oauth/token/",
   method: "POST",
   headers: {
     "X-API-Key": apiKey,
@@ -42,7 +41,6 @@ const getAuthorizationRequestOptions = code => ({
 })
 
 const getRefreshRequestOptions = refreshToken => ({
-  url: "https://www.bungie.net/platform/app/oauth/token/",
   method: "POST",
   headers: {
     "X-API-Key": apiKey,
@@ -51,17 +49,7 @@ const getRefreshRequestOptions = refreshToken => ({
   body: `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`
 })
 
-const getUserRequestOptions = accessToken => ({
-  url: "https://www.bungie.net/Platform/User/GetCurrentBungieAccount/",
-  method: "GET",
-  headers: {
-    "X-API-Key": apiKey,
-    Authorization: `Bearer ${accessToken}`
-  }
-})
-
-const getClanOptions = (accessToken, clanId) => ({
-  url: `https://www.bungie.net/Platform/GroupV2/${clanId}`,
+const getRequestOptions = accessToken => ({
   method: "GET",
   headers: {
     "X-API-Key": apiKey,
@@ -121,14 +109,14 @@ app.get("/api/login", (request, response) => {
 
   console.log('Logging user in')
 
-  requestPromise(options)
+  fetch('https://www.bungie.net/platform/app/oauth/token/', options)
     .catch(({ statusCode }) => {
       throw statusCode
     })
     .then(response => {
       console.log('Checking cookie...')
 
-      const json = JSON.parse(response)
+      const json = response.json()
       return checkNinja(cookieToken, json.access_token, json.refresh_token)
     })
     .then(({ accessToken, refreshToken, ...model }) => {
@@ -243,14 +231,16 @@ app.get("/api/clan", (request, response) => {
   getAccessTokens(token)
     .then(data => checkNinja(token, data.access_token, data.refresh_token))
     .then(({ accessToken }) => {
-      const options = getClanOptions(accessToken, clanId)
-      return requestPromise(options)
+      const options = getRequestOptions(accessToken)
+
+      return fetch(`https://www.bungie.net/Platform/GroupV2/${clanId}`, options)
     })
     .catch(({ statusCode }) => {
       throw statusCode
     })
     .then(response => {
-      const jsonResponse = JSON.parse(response)
+      const jsonResponse = response.json()
+
       if (jsonResponse.ErrorStatus === "GroupNotFound") throw NOT_FOUND
 
       const clan = jsonResponse.Response.detail
@@ -328,7 +318,7 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
     getUser(accessToken)
       // Valid Access Token
       .then(response => {
-        const user = JSON.parse(response).Response.bungieNetUser
+        const user = response.json().Response.bungieNetUser
         model = generateModel(user, cookieToken, accessToken, refreshToken)
       })
       // Invalid Access Token - Use Refresh Token
@@ -336,13 +326,13 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
         const options = getRefreshRequestOptions(refreshToken)
 
         return (
-          requestPromise(options)
+          fetch('https://www.bungie.net/platform/app/oauth/token/', options)
             // Invalid Refresh Token
             .catch(({ statusCode }) => {
               throw statusCode
             })
             .then(response => {
-              const tokens = JSON.parse(response)
+              const tokens = response.json()
 
               return (
                 getUser(tokens.access_token)
@@ -351,7 +341,7 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
                     throw statusCode
                   })
                   .then(response => {
-                    const user = JSON.parse(response).Response.bungieNetUser
+                    const user = response.json().Response.bungieNetUser
 
                     // Update tokens in DB
                     return updateTokens(
@@ -387,8 +377,9 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
 }
 
 const getUser = accessToken => {
-  const options = getUserRequestOptions(accessToken)
-  return requestPromise(options)
+  const options = getRequestOptions(accessToken)
+
+  return fetch('https://www.bungie.net/Platform/User/GetCurrentBungieAccount/', options)
 }
 
 const generateModel = (user, cookieToken, accessToken, refreshToken) => ({
