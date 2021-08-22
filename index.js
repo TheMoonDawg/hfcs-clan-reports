@@ -4,7 +4,7 @@ const nodeFetch = require("node-fetch")
 const path = require("path")
 // const csParse = require("pg-connection-string").parse
 const { Pool } = require("pg")
-const uuidv4 = require("uuid/v4")
+const { v4: uuidv4 } = require("uuid")
 const app = express()
 
 // Config
@@ -21,33 +21,34 @@ const clientSecret = process.env.CLIENT_SECRET || bungieConfig.client_secret
 const resources = process.env.RESOURCES || bungieConfig.resources
 const connectionString = process.env.DATABASE_URL || bungieConfig.database_url
 
-const fetch = (url, options) => nodeFetch(url, options).then(response => response.json())
+const fetch = (url, options) =>
+  nodeFetch(url, options).then((response) => response.json())
 
 // Request Options
-const getAuthorizationRequestOptions = code => ({
+const getAuthorizationRequestOptions = (code) => ({
   method: "POST",
   headers: {
     "X-API-Key": apiKey,
-    "Content-Type": "application/x-www-form-urlencoded"
+    "Content-Type": "application/x-www-form-urlencoded",
   },
-  body: `grant_type=authorization_code&code=${code}&client_id=${clientId}&client_secret=${clientSecret}`
+  body: `grant_type=authorization_code&code=${code}&client_id=${clientId}&client_secret=${clientSecret}`,
 })
 
-const getRefreshRequestOptions = refreshToken => ({
+const getRefreshRequestOptions = (refreshToken) => ({
   method: "POST",
   headers: {
     "X-API-Key": apiKey,
-    "Content-Type": "application/x-www-form-urlencoded"
+    "Content-Type": "application/x-www-form-urlencoded",
   },
-  body: `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`
+  body: `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`,
 })
 
-const getRequestOptions = accessToken => ({
+const getRequestOptions = (accessToken) => ({
   method: "GET",
   headers: {
     "X-API-Key": apiKey,
-    Authorization: `Bearer ${accessToken}`
-  }
+    Authorization: `Bearer ${accessToken}`,
+  },
 })
 
 const OK = 200
@@ -55,7 +56,7 @@ const UNAUTHORIZED = 401
 const NOT_FOUND = 404
 const SERVER_ERROR = 500
 
-const getErrorMessage = statusCode => {
+const getErrorMessage = (statusCode) => {
   switch (statusCode) {
     case 401:
       return "Hey, you're not allowed to be here. Shoo!"
@@ -67,7 +68,7 @@ const getErrorMessage = statusCode => {
   }
 }
 
-const getAuthToken = request => request.headers.authorization.substring(6)
+const getAuthToken = (request) => request.headers.authorization.substring(6)
 
 app.set("port", process.env.PORT || 5000)
 
@@ -100,11 +101,11 @@ app.get("/api/login", (request, response) => {
   const options = getAuthorizationRequestOptions(request.query.code)
   const cookieToken = uuidv4()
 
-  fetch('https://www.bungie.net/platform/app/oauth/token/', options)
+  fetch("https://www.bungie.net/platform/app/oauth/token/", options)
     .catch(({ statusCode }) => {
       throw statusCode
     })
-    .then(data => {
+    .then((data) => {
       return checkNinja(cookieToken, data.access_token, data.refresh_token)
     })
     .then(({ accessToken, refreshToken, ...model }) => {
@@ -114,20 +115,18 @@ app.get("/api/login", (request, response) => {
         accessToken,
         refreshToken
       ).then(() => model)
-    }
-    )
-    .then(model => {
-      return getRegion(model.membershipId).then(region => ({
+    })
+    .then((model) => {
+      return getRegion(model.membershipId).then((region) => ({
         ...model,
-        region
+        region,
       }))
-    }
-    )
-    .then(model => {
+    })
+    .then((model) => {
       response.statusCode = OK
       response.send(model)
     })
-    .catch(statusCode => {
+    .catch((statusCode) => {
       response.statusCode = statusCode
       response.statusMessage = getErrorMessage(statusCode)
       response.end()
@@ -140,8 +139,8 @@ app.get("/api/search", (request, response) => {
   const token = getAuthToken(request)
 
   getAccessTokens(token)
-    .then(data => checkNinja(token, data.access_token, data.refresh_token))
-    .then(user => {
+    .then((data) => checkNinja(token, data.access_token, data.refresh_token))
+    .then((user) => {
       let query = `
         SELECT
           r.id,
@@ -196,11 +195,11 @@ app.get("/api/search", (request, response) => {
 
       return executeQuery(query, values)
     })
-    .then(data => {
+    .then((data) => {
       response.statusCode = OK
       response.send(data)
     })
-    .catch(statusCode => {
+    .catch((statusCode) => {
       response.statusCode = statusCode
       response.statusMessage = getErrorMessage(statusCode)
       response.end()
@@ -213,7 +212,7 @@ app.get("/api/clan", (request, response) => {
   const token = getAuthToken(request)
 
   getAccessTokens(token)
-    .then(data => checkNinja(token, data.access_token, data.refresh_token))
+    .then((data) => checkNinja(token, data.access_token, data.refresh_token))
     .then(({ accessToken }) => {
       const options = getRequestOptions(accessToken)
 
@@ -222,7 +221,7 @@ app.get("/api/clan", (request, response) => {
     .catch(({ statusCode }) => {
       throw statusCode
     })
-    .then(data => {
+    .then((data) => {
       if (data.ErrorStatus === "GroupNotFound") throw NOT_FOUND
 
       const clan = data.Response.detail
@@ -231,14 +230,14 @@ app.get("/api/clan", (request, response) => {
         id: clan.groupId,
         name: clan.name,
         motto: clan.motto,
-        missionStatement: clan.about
+        missionStatement: clan.about,
       }
     })
-    .then(data => {
+    .then((data) => {
       response.statusCode = OK
       response.send(data)
     })
-    .catch(statusCode => {
+    .catch((statusCode) => {
       response.statusCode = statusCode
       response.statusMessage = getErrorMessage(statusCode)
       response.end()
@@ -250,14 +249,14 @@ app.post("/api/new", (request, response) => {
   const token = getAuthToken(request)
 
   getAccessTokens(token)
-    .then(data => checkNinja(token, data.access_token, data.refresh_token))
+    .then((data) => checkNinja(token, data.access_token, data.refresh_token))
     .then(
-      user =>
-        new Promise(resolve => {
+      (user) =>
+        new Promise((resolve) => {
           let body = ""
 
           request
-            .on("data", chunk => {
+            .on("data", (chunk) => {
               body += chunk
             })
             .on("end", () => {
@@ -276,7 +275,7 @@ app.post("/api/new", (request, response) => {
                 data.notes,
                 user.membershipId,
                 data.judgment,
-                data.region
+                data.region,
               ]
 
               resolve(executeQuery(query, params))
@@ -287,7 +286,7 @@ app.post("/api/new", (request, response) => {
       response.statusCode = OK
       response.send()
     })
-    .catch(statusCode => {
+    .catch((statusCode) => {
       response.statusCode = statusCode
       response.statusMessage = getErrorMessage(statusCode)
       response.end()
@@ -300,7 +299,7 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
   return (
     getUser(accessToken)
       // Valid Access Token
-      .then(data => {
+      .then((data) => {
         const user = data.Response.bungieNetUser
 
         model = generateModel(user, cookieToken, accessToken, refreshToken)
@@ -310,19 +309,19 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
         const options = getRefreshRequestOptions(refreshToken)
 
         return (
-          fetch('https://www.bungie.net/platform/app/oauth/token/', options)
+          fetch("https://www.bungie.net/platform/app/oauth/token/", options)
             // Invalid Refresh Token
             .catch(({ statusCode }) => {
               throw statusCode
             })
-            .then(data => {
+            .then((data) => {
               return (
                 getUser(data.access_token)
                   // New Access Token also invalid
                   .catch(({ statusCode }) => {
                     throw statusCode
                   })
-                  .then(data => {
+                  .then((data) => {
                     const user = data.Response.bungieNetUser
 
                     // Update tokens in DB
@@ -350,19 +349,21 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
           "SELECT display_name FROM ninja WHERE ninja_id = $1 AND active",
           [model.membershipId]
         )
-      }
-      )
-      .then(result => {
+      })
+      .then((result) => {
         if (result.length == 0) throw UNAUTHORIZED
       })
       .then(() => model)
   )
 }
 
-const getUser = accessToken => {
+const getUser = (accessToken) => {
   const options = getRequestOptions(accessToken)
 
-  return fetch('https://www.bungie.net/Platform/User/GetCurrentBungieAccount/', options)
+  return fetch(
+    "https://www.bungie.net/Platform/User/GetCurrentBungieAccount/",
+    options
+  )
 }
 
 const generateModel = (user, cookieToken, accessToken, refreshToken) => ({
@@ -372,13 +373,13 @@ const generateModel = (user, cookieToken, accessToken, refreshToken) => ({
   resources,
   cookieToken,
   accessToken,
-  refreshToken
+  refreshToken,
 })
 
-const getAccessTokens = cookieToken =>
+const getAccessTokens = (cookieToken) =>
   executeQuery("SELECT * FROM token WHERE cookie_token=$1;", [
-    cookieToken
-  ]).then(data => {
+    cookieToken,
+  ]).then((data) => {
     if (!data || data.length === 0) {
       throw UNAUTHORIZED
     } else if (data.length > 1) {
@@ -390,8 +391,8 @@ const getAccessTokens = cookieToken =>
 
 const updateTokens = (membershipId, cookieToken, accessToken, refreshToken) =>
   executeQuery("SELECT ninja_id FROM token WHERE ninja_id=$1", [
-    membershipId
-  ]).then(result => {
+    membershipId,
+  ]).then((result) => {
     let query, params
 
     // Update Tokens
@@ -410,25 +411,25 @@ const updateTokens = (membershipId, cookieToken, accessToken, refreshToken) =>
     executeQuery(query, params)
   })
 
-const getRegion = membershipId =>
+const getRegion = (membershipId) =>
   executeQuery("SELECT region FROM ninja WHERE ninja_id=$1", [
-    membershipId
-  ]).then(result => result[0].region)
+    membershipId,
+  ]).then((result) => result[0].region)
 
 const executeQuery = (query, params) => {
   const pool = new Pool({
     connectionString,
     ssl: {
-      rejectUnauthorized: false
-    }
+      rejectUnauthorized: false,
+    },
   })
 
   return pool
     .query(query, params)
-    .then(res => {
+    .then((res) => {
       return res.rows
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err)
       throw SERVER_ERROR
     })
