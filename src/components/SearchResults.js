@@ -15,18 +15,18 @@ import { withStyles } from "@material-ui/core/styles"
 
 const styles = ({ spacing }) => ({
   content: {
-    overflow: "auto"
+    overflow: "auto",
   },
   link: {
-    textDecoration: "none"
+    textDecoration: "none",
   },
   iconButton: {
     width: spacing.unit * 4,
-    height: spacing.unit * 4
-  }
+    height: spacing.unit * 4,
+  },
 })
 
-const generateLink = clanId =>
+const generateLink = (clanId) =>
   `https://www.bungie.net/en/ClanV2/?groupid=${clanId}`
 
 class SearchResults extends Component {
@@ -40,35 +40,36 @@ class SearchResults extends Component {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="dense">Report Date</TableCell>
-                <TableCell padding="dense">Clan Name</TableCell>
-                <TableCell padding="dense">Motto</TableCell>
-                <TableCell padding="dense">Mission Statement</TableCell>
-                <TableCell padding="dense">Ninja</TableCell>
-                <TableCell padding="dense">Judgment</TableCell>
-                <TableCell padding="dense">Notes</TableCell>
-                <TableCell padding="dense">Link</TableCell>
+                <TableCell padding='dense'>Report Date</TableCell>
+                <TableCell padding='dense'>Clan Name</TableCell>
+                <TableCell padding='dense'>Motto</TableCell>
+                <TableCell padding='dense'>Mission Statement</TableCell>
+                <TableCell padding='dense'>Ninja</TableCell>
+                <TableCell padding='dense'>Judgment</TableCell>
+                <TableCell padding='dense'>Notes</TableCell>
+                <TableCell padding='dense'>Link</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {results.map(row => (
+              {results.map((row) => (
                 <TableRow key={row.id}>
-                  <TableCell padding="dense">
-                    {flow(parseISO, format('Pp'))(row.reportDate)}
+                  <TableCell padding='dense'>
+                    {flow(parseISO, format("Pp"))(row.reportDate)}
                   </TableCell>
-                  <TableCell padding="dense">{row.clanName}</TableCell>
-                  <TableCell padding="dense">{row.clanMotto}</TableCell>
-                  <TableCell padding="dense">
+                  <TableCell padding='dense'>{row.clanName}</TableCell>
+                  <TableCell padding='dense'>{row.clanMotto}</TableCell>
+                  <TableCell padding='dense'>
                     {row.clanMissionStatement}
                   </TableCell>
-                  <TableCell padding="dense">{row.ninja}</TableCell>
-                  <TableCell padding="dense">{row.judgment}</TableCell>
-                  <TableCell padding="dense">{row.notes}</TableCell>
-                  <TableCell padding="dense">
+                  <TableCell padding='dense'>{row.ninja}</TableCell>
+                  <TableCell padding='dense'>{row.judgment}</TableCell>
+                  <TableCell padding='dense'>{row.notes}</TableCell>
+                  <TableCell padding='dense'>
                     <a
                       className={classes.link}
                       href={generateLink(row.clanId)}
-                      target="_blank"
+                      target='_blank'
+                      rel='noreferrer'
                     >
                       <IconButton className={classes.iconButton}>
                         <Icon>open_in_new</Icon>

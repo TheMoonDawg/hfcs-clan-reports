@@ -1,18 +1,16 @@
-import React, { Component } from "react"
-
+import React from "react"
 import AppBar from "@material-ui/core/AppBar"
-import AuthorizedUser from "./AuthorizedUser"
 import IconButton from "@material-ui/core/IconButton"
-import LoggedOut from "./LoggedOut"
-import MenuIcon from "@material-ui/icons/Menu"
 import Toolbar from "@material-ui/core/Toolbar"
 import Typography from "@material-ui/core/Typography"
-import { compose } from "recompose"
+import { makeStyles } from "@material-ui/core/styles"
+import MenuIcon from "@material-ui/icons/Menu"
+import useWidth from "../hooks/useWidth"
 import isDesktop from "../utils/isDesktop"
-import { withStyles } from "@material-ui/core/styles"
-import withWidth from "@material-ui/core/withWidth"
+import AuthorizedUser from "./AuthorizedUser"
+import LoggedOut from "./LoggedOut"
 
-const styles = ({ zIndex, spacing }) => ({
+const useStyles = makeStyles(({ zIndex, spacing }) => ({
   appBar: {
     zIndex: zIndex.drawer + 1,
   },
@@ -34,39 +32,33 @@ const styles = ({ zIndex, spacing }) => ({
     height: 45,
     marginLeft: spacing.unit * 2,
   },
-})
+}))
 
-class AppToolbar extends Component {
-  render() {
-    const { classes, user, toggleDrawer, onLogOut, onError, width } = this.props
+export default function AppToolbar({ user, toggleDrawer, onLogOut, onError }) {
+  const classes = useStyles()
+  const width = useWidth()
 
-    return (
-      <AppBar position="absolute" className={classes.appBar}>
-        <Toolbar className={classes.toolbar}>
-          {isDesktop(width) ? (
-            <Typography variant="title" color="inherit">
-              HFCS Clan Reports
-            </Typography>
-          ) : (
-            <IconButton className={classes.iconButton} onClick={toggleDrawer}>
-              <MenuIcon />
-            </IconButton>
-          )}
+  return (
+    <AppBar position='absolute' className={classes.appBar}>
+      <Toolbar className={classes.toolbar}>
+        {isDesktop(width) ? (
+          <Typography variant='title' color='inherit'>
+            HFCS Clan Reports
+          </Typography>
+        ) : (
+          <IconButton className={classes.iconButton} onClick={toggleDrawer}>
+            <MenuIcon />
+          </IconButton>
+        )}
 
-          <span className={classes.flex} />
+        <span className={classes.flex} />
 
-          {user ? (
-            <AuthorizedUser user={user} onLogOut={onLogOut} />
-          ) : (
-            <LoggedOut onError={onError} />
-          )}
-        </Toolbar>
-      </AppBar>
-    )
-  }
+        {user ? (
+          <AuthorizedUser user={user} onLogOut={onLogOut} />
+        ) : (
+          <LoggedOut onError={onError} />
+        )}
+      </Toolbar>
+    </AppBar>
+  )
 }
-
-export default compose(
-  withWidth(),
-  withStyles(styles),
-)(AppToolbar)

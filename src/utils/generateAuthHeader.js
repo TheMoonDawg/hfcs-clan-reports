@@ -1,1 +1,3 @@
-export default cookieToken => ({ Authorization: `Basic ${cookieToken}` })
+export default function generateAuthHeader(cookieToken) {
+  return { Authorization: `Basic ${cookieToken}` }
+}

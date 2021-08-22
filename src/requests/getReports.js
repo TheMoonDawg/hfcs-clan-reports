@@ -1,14 +1,16 @@
 import queryString from "query-string"
-import generateAuthHeader from "../utils/generateAuthHeader"
 import Error from "../utils/Error"
+import generateAuthHeader from "../utils/generateAuthHeader"
 
-export default ({ cookieToken }, params) => {
+export default function getReports({ cookieToken }, params) {
   const options = { headers: generateAuthHeader(cookieToken) }
 
   return fetch(`../api/search?${queryString.stringify(params)}`, options).then(
     (result) => {
       if (result.status === 200) return result.json()
-      else { throw new Error(result) }
+      else {
+        throw new Error(result)
+      }
     }
   )
 }
