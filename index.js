@@ -260,42 +260,6 @@ app.get("/api/clan", async (request, response) => {
     response.statusMessage = getErrorMessage(statusCode)
     response.end()
   }
-
-  // getAccessTokens(token)
-  //   .then((data) => checkNinja(token, data.access_token, data.refresh_token))
-  //   .then(({ accessToken }) => {
-  //     const options = getRequestOptions(accessToken)
-
-  //     console.log(options)
-
-  //     return fetch(`https://www.bungie.net/Platform/GroupV2/${clanId}`, options)
-  //   })
-  //   .catch(({ statusCode }) => {
-  //     throw statusCode
-  //   })
-  //   .then((data) => {
-  //     console.log("data!", data)
-
-  //     if (data.ErrorStatus === "GroupNotFound") throw NOT_FOUND
-
-  //     const clan = data.Response.detail
-
-  //     return {
-  //       id: clan.groupId,
-  //       name: clan.name,
-  //       motto: clan.motto,
-  //       missionStatement: clan.about,
-  //     }
-  //   })
-  //   .then((data) => {
-  //     response.statusCode = OK
-  //     response.send(data)
-  //   })
-  //   .catch((statusCode) => {
-  //     response.statusCode = statusCode
-  //     response.statusMessage = getErrorMessage(statusCode)
-  //     response.end()
-  //   })
 })
 
 // New Clan Report
@@ -347,74 +311,51 @@ app.post("/api/new", (request, response) => {
     })
 })
 
-const checkNinja = (cookieToken, accessToken, refreshToken) => {
+const checkNinja = async (cookieToken, accessToken, refreshToken) => {
   let model
 
-  return (
-    getUser(accessToken)
-      // Valid Access Token
-      .then((data) => {
-        console.log("is this actually valid tho", data)
+  try {
+    const resp = await getUser(accessToken)
+    const user = resp.Response.bungieNetUser
 
-        const user = data.Response.bungieNetUser
+    model = generateModel(user, cookieToken, accessToken, refreshToken)
+  } catch {
+    // Invalid Access Token - Use Refresh Token
+    const options = getRefreshRequestOptions(refreshToken)
+    const tokens = await fetch(
+      "https://www.bungie.net/platform/app/oauth/token/",
+      options
+    )
 
-        model = generateModel(user, cookieToken, accessToken, refreshToken)
-      })
-      // Invalid Access Token - Use Refresh Token
-      .catch(() => {
-        const options = getRefreshRequestOptions(refreshToken)
+    const resp = await getUser(tokens.access_token)
+    const user = resp.Response.bungieNetUser
 
-        return (
-          fetch("https://www.bungie.net/platform/app/oauth/token/", options)
-            // Invalid Refresh Token
-            .catch(({ statusCode }) => {
-              throw statusCode
-            })
-            .then((data) => {
-              console.log("what were the tokens", data)
+    // Update tokens in database
+    await updateTokens(
+      user.membershipId,
+      cookieToken,
+      tokens.access_token,
+      tokens.refresh_token
+    )
 
-              return (
-                getUser(data.access_token)
-                  // New Access Token also invalid
-                  .catch(({ statusCode }) => {
-                    throw statusCode
-                  })
-                  .then((data) => {
-                    console.log("DATA FOR USER", data)
+    model = generateModel(
+      user,
+      cookieToken,
+      tokens.access_token,
+      tokens.refresh_token
+    )
+  }
 
-                    const user = data.Response.bungieNetUser
-
-                    // Update tokens in DB
-                    return updateTokens(
-                      user.membershipId,
-                      cookieToken,
-                      data.access_token,
-                      data.refresh_token
-                    ).then(() => {
-                      model = generateModel(
-                        user,
-                        cookieToken,
-                        data.access_token,
-                        data.refresh_token
-                      )
-                    })
-                  })
-              )
-            })
-        )
-      })
-      // Check Authorized Ninja
-      .then(() => {
-        return executeQuery(
-          "SELECT display_name FROM ninja WHERE ninja_id = $1 AND active",
-          [model.membershipId]
-        )
-      })
-      .then((result) => {
-        if (result.length == 0) throw UNAUTHORIZED
-      })
-      .then(() => model)
+  const results = await executeQuery(
+    "SELECT display_name FROM ninja WHERE ninja_id = $1 AND active",
+    [model.membershipId]
   )
+
+  if (results.length === 0) {
+    throw UNAUTHORIZED
+  }
+
+  return model
 }
 
 const getUser = (accessToken) => {
