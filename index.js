@@ -225,6 +225,8 @@ app.get("/api/clan", async (request, response) => {
       tokens.refresh_token
     )
 
+    console.log(userInfo)
+
     const options = getRequestOptions(userInfo.accessToken)
 
     console.log(options)
@@ -352,6 +354,8 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
     getUser(accessToken)
       // Valid Access Token
       .then((data) => {
+        console.log("is this actually valid tho", data)
+
         const user = data.Response.bungieNetUser
 
         model = generateModel(user, cookieToken, accessToken, refreshToken)
@@ -367,6 +371,8 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
               throw statusCode
             })
             .then((data) => {
+              console.log("what were the tokens", data)
+
               return (
                 getUser(data.access_token)
                   // New Access Token also invalid
@@ -374,6 +380,8 @@ const checkNinja = (cookieToken, accessToken, refreshToken) => {
                     throw statusCode
                   })
                   .then((data) => {
+                    console.log("DATA FOR USER", data)
+
                     const user = data.Response.bungieNetUser
 
                     // Update tokens in DB
