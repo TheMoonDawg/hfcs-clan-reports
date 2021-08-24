@@ -207,47 +207,93 @@ app.get("/api/search", (request, response) => {
 })
 
 // Get Clan info from Bnet
-app.get("/api/clan", (request, response) => {
+app.get("/api/clan", async (request, response) => {
   const clanId = request.query.clan_id
   const token = getAuthToken(request)
 
   console.log(clanId)
+  console.log(token)
 
-  getAccessTokens(token)
-    .then((data) => checkNinja(token, data.access_token, data.refresh_token))
-    .then(({ accessToken }) => {
-      const options = getRequestOptions(accessToken)
+  try {
+    const tokens = await getAccessTokens(token)
 
-      console.log(options)
+    console.log("tokens", tokens)
 
-      return fetch(`https://www.bungie.net/Platform/GroupV2/${clanId}`, options)
-    })
-    .catch(({ statusCode }) => {
-      throw statusCode
-    })
-    .then((data) => {
-      console.log("data!", data)
+    const userInfo = await checkNinja(
+      token,
+      tokens.access_token,
+      tokens.refresh_token
+    )
 
-      if (data.ErrorStatus === "GroupNotFound") throw NOT_FOUND
+    const options = getRequestOptions(userInfo.accessToken)
 
-      const clan = data.Response.detail
+    console.log(options)
 
-      return {
-        id: clan.groupId,
-        name: clan.name,
-        motto: clan.motto,
-        missionStatement: clan.about,
-      }
-    })
-    .then((data) => {
-      response.statusCode = OK
-      response.send(data)
-    })
-    .catch((statusCode) => {
-      response.statusCode = statusCode
-      response.statusMessage = getErrorMessage(statusCode)
-      response.end()
-    })
+    const clanInfo = await fetch(
+      `https://www.bungie.net/Platform/GroupV2/${clanId}`,
+      options
+    )
+
+    console.log(clanInfo)
+
+    if (clanInfo.ErrorStatus === "GroupNotFound") throw NOT_FOUND
+
+    const clan = clanInfo.Response.detail
+
+    const data = {
+      id: clan.groupId,
+      name: clan.name,
+      motto: clan.motto,
+      missionStatement: clan.about,
+    }
+
+    console.log(data)
+
+    response.statusCode = OK
+    response.send(data)
+  } catch (statusCode) {
+    console.log("FAILED", statusCode)
+
+    response.statusCode = statusCode
+    response.statusMessage = getErrorMessage(statusCode)
+    response.end()
+  }
+
+  // getAccessTokens(token)
+  //   .then((data) => checkNinja(token, data.access_token, data.refresh_token))
+  //   .then(({ accessToken }) => {
+  //     const options = getRequestOptions(accessToken)
+
+  //     console.log(options)
+
+  //     return fetch(`https://www.bungie.net/Platform/GroupV2/${clanId}`, options)
+  //   })
+  //   .catch(({ statusCode }) => {
+  //     throw statusCode
+  //   })
+  //   .then((data) => {
+  //     console.log("data!", data)
+
+  //     if (data.ErrorStatus === "GroupNotFound") throw NOT_FOUND
+
+  //     const clan = data.Response.detail
+
+  //     return {
+  //       id: clan.groupId,
+  //       name: clan.name,
+  //       motto: clan.motto,
+  //       missionStatement: clan.about,
+  //     }
+  //   })
+  //   .then((data) => {
+  //     response.statusCode = OK
+  //     response.send(data)
+  //   })
+  //   .catch((statusCode) => {
+  //     response.statusCode = statusCode
+  //     response.statusMessage = getErrorMessage(statusCode)
+  //     response.end()
+  //   })
 })
 
 // New Clan Report
