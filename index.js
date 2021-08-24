@@ -211,10 +211,14 @@ app.get("/api/clan", (request, response) => {
   const clanId = request.query.clan_id
   const token = getAuthToken(request)
 
+  console.log(clanId)
+
   getAccessTokens(token)
     .then((data) => checkNinja(token, data.access_token, data.refresh_token))
     .then(({ accessToken }) => {
       const options = getRequestOptions(accessToken)
+
+      console.log(options)
 
       return fetch(`https://www.bungie.net/Platform/GroupV2/${clanId}`, options)
     })
@@ -222,6 +226,8 @@ app.get("/api/clan", (request, response) => {
       throw statusCode
     })
     .then((data) => {
+      console.log("data!", data)
+
       if (data.ErrorStatus === "GroupNotFound") throw NOT_FOUND
 
       const clan = data.Response.detail
