@@ -211,13 +211,8 @@ app.get("/api/clan", async (request, response) => {
   const clanId = request.query.clan_id
   const token = getAuthToken(request)
 
-  console.log(clanId)
-  console.log(token)
-
   try {
     const tokens = await getAccessTokens(token)
-
-    console.log("tokens", tokens)
 
     const userInfo = await checkNinja(
       token,
@@ -225,18 +220,12 @@ app.get("/api/clan", async (request, response) => {
       tokens.refresh_token
     )
 
-    console.log(userInfo)
-
     const options = getRequestOptions(userInfo.accessToken)
-
-    console.log(options)
 
     const clanInfo = await fetch(
       `https://www.bungie.net/Platform/GroupV2/${clanId}`,
       options
     )
-
-    console.log(clanInfo)
 
     if (clanInfo.ErrorStatus === "GroupNotFound") throw NOT_FOUND
 
@@ -249,13 +238,9 @@ app.get("/api/clan", async (request, response) => {
       missionStatement: clan.about,
     }
 
-    console.log(data)
-
     response.statusCode = OK
     response.send(data)
   } catch (statusCode) {
-    console.log("FAILED", statusCode)
-
     response.statusCode = statusCode
     response.statusMessage = getErrorMessage(statusCode)
     response.end()
