@@ -1,15 +1,14 @@
 import React, { Component } from "react"
-
 import Button from "@material-ui/core/Button"
 import Card from "@material-ui/core/Card"
 import CardActions from "@material-ui/core/CardActions"
 import CardContent from "@material-ui/core/CardContent"
 import CardHeader from "@material-ui/core/CardHeader"
 import MenuItem from "@material-ui/core/MenuItem"
-import SearchResults from "./SearchResults"
 import TextField from "@material-ui/core/TextField"
-import getReports from "../requests/getReports"
 import { withStyles } from "@material-ui/core/styles"
+import getReports from "../requests/getReports"
+import SearchResults from "./SearchResults"
 
 const styles = ({ spacing }) => ({
   card: {
@@ -42,16 +41,16 @@ class Search extends Component {
     return null
   }
 
-  onChange = key => event => this.setState({ [key]: event.target.value })
+  onChange = (key) => (event) => this.setState({ [key]: event.target.value })
   onIdChange = this.onChange("id")
   onNameChange = this.onChange("name")
   onRegionChange = this.onChange("region")
 
-  onFetchReports = params => {
+  onFetchReports = (params) => {
     const { user, onError } = this.props
 
     getReports(user, params)
-      .then(result => {
+      .then((result) => {
         this.setState({ results: result })
       })
       .catch(onError)
@@ -86,12 +85,12 @@ class Search extends Component {
     return (
       <React.Fragment>
         <Card className={classes.card}>
-          <CardHeader title="Search" />
+          <CardHeader title='Search' />
           <CardContent>
             <TextField
-              type="number"
+              type='number'
               className={classes.textField}
-              label="Clan Id:"
+              label='Clan Id:'
               disabled={!user}
               value={id}
               onChange={this.onIdChange}
@@ -101,7 +100,7 @@ class Search extends Component {
 
             <TextField
               className={classes.textField}
-              label="Clan Name:"
+              label='Clan Name:'
               disabled={!user}
               value={name}
               onChange={this.onNameChange}
@@ -113,26 +112,26 @@ class Search extends Component {
               className={classes.textField}
               InputLabelProps={{ shrink: true }}
               select
-              label="Region:"
+              label='Region:'
               disabled={!user}
               value={region}
               onChange={this.onRegionChange}
             >
-              <MenuItem value="English">English</MenuItem>
-              <MenuItem value="French">French</MenuItem>
-              <MenuItem value="German">German</MenuItem>
-              <MenuItem value="Italian">Italian</MenuItem>
-              <MenuItem value="Polish">Polish</MenuItem>
-              <MenuItem value="Portuguese">Portuguese</MenuItem>
-              <MenuItem value="Spanish">Spanish</MenuItem>
+              <MenuItem value='English'>English</MenuItem>
+              <MenuItem value='French'>French</MenuItem>
+              <MenuItem value='German'>German</MenuItem>
+              <MenuItem value='Italian'>Italian</MenuItem>
+              <MenuItem value='Polish'>Polish</MenuItem>
+              <MenuItem value='Portuguese'>Portuguese</MenuItem>
+              <MenuItem value='Spanish'>Spanish</MenuItem>
             </TextField>
           </CardContent>
           <CardActions>
             <div className={classes.buttonContainer}>
               <Button
                 className={classes.button}
-                variant="raised"
-                color="primary"
+                variant='contained'
+                color='primary'
                 onClick={this.onSearch}
                 disabled={!user || (!id.trim() && !name.trim())}
               >
@@ -140,7 +139,7 @@ class Search extends Component {
               </Button>
               <Button
                 className={classes.button}
-                variant="outlined"
+                variant='outlined'
                 onClick={this.onLast100Reports}
                 disabled={!user}
               >
@@ -148,7 +147,7 @@ class Search extends Component {
               </Button>
               <Button
                 className={classes.button}
-                variant="outlined"
+                variant='outlined'
                 onClick={this.onLast100RegionalReports}
                 disabled={!user}
               >
@@ -156,7 +155,7 @@ class Search extends Component {
               </Button>
               <Button
                 className={classes.button}
-                variant="outlined"
+                variant='outlined'
                 onClick={this.onUserLast100Reports}
                 disabled={!user}
               >
@@ -166,7 +165,7 @@ class Search extends Component {
           </CardActions>
         </Card>
 
-        {results && <SearchResults title="Search Results" results={results} />}
+        {results && <SearchResults title='Search Results' results={results} />}
       </React.Fragment>
     )
   }
