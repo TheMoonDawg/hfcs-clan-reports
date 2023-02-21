@@ -95,9 +95,9 @@ app.listen(app.get("port"), () => {
 // ---------------------------
 
 // Serve React files
-app.use(express.static(path.join(__dirname, "build")))
+app.use(express.static(path.join(__dirname, "dist")))
 app.get(["/", "/search", "/new", "/redirect"], (_request, response) => {
-  response.sendFile(path.join(__dirname, "build/index.html"))
+  response.sendFile(path.join(__dirname, "dist/index.html"))
 })
 
 // ---------------------------

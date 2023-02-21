@@ -20,7 +20,8 @@
     "vite": "^4.1.4"
   },
   "scripts": {
-    "start": "vite",
+    "start": "node index.js",
+    "client": "vite",
     "build": "vite build"
   },
   "eslintConfig": {
