@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { Link } from "react-router-dom"
 import {
+  Box,
   Divider,
   Drawer,
   Fade,
@@ -13,48 +14,14 @@ import {
 } from '@mui/material'
 
 
-import { makeStyles } from "@material-ui/core/styles"
-import useWidth from "../hooks/useWidth"
+// import useWidth from "../hooks/useWidth"
 import background from "../images/background.jpg"
 // import isDesktop from "../utils/isDesktop"
 
-const useStyles = makeStyles(({ mixins, spacing, palette }) => ({
-  drawerPaper: {
-    position: "relative",
-    width: 240,
-  },
-  toolbar: mixins.toolbar,
-  link: {
-    textDecoration: "none",
-    color: "inherit",
-  },
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    height: "100%",
-  },
-  resourcesLabel: {
-    marginLeft: spacing.unit,
-    marginBottom: spacing.unit * 3,
-  },
-  resourcesContainer: {
-    marginLeft: spacing.unit,
-
-    "& > a": {
-      display: "block",
-      color: palette.common.white,
-      textDecoration: "none",
-      marginBottom: spacing.unit,
-    },
-  },
-  flex: {
-    flex: 1,
-  },
-}))
 
 export default function AppMenu({ user, drawerOpen, toggleDrawer }) {
-  const classes = useStyles()
-  const width = useWidth()
+
+  // const width = useWidth()
 
   const [renderImage, setRenderImage] = useState(false)
 
@@ -67,11 +34,15 @@ export default function AppMenu({ user, drawerOpen, toggleDrawer }) {
       open={drawerOpen}
       onClose={toggleDrawer}
       variant={drawerVariant}
-      classes={{
-        paper: classes.drawerPaper,
+      // classes={{
+      //   paper: classes.drawerPaper,
+      // }}
+      sx={{
+        position: "relative",
+        width: 240,
       }}
     >
-      {desktopMode && <div className={classes.toolbar} />}
+      {desktopMode && <Box sx={theme => theme.mixins.toolbar} />}
       <List>
         <Link sx={{
           textDecoration: "none",
@@ -98,18 +69,31 @@ export default function AppMenu({ user, drawerOpen, toggleDrawer }) {
       </List>
       <Divider />
       <List />
-      <div className={classes.container}>
+      <Box sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+      }}>
         {user && (
-          <Typography variant='headline' className={classes.resourcesLabel}>
+          <Typography variant='headline' sx={{ ml: 1, mb: 3 }}>
             Resources
           </Typography>
         )}
-        <div
-          className={classes.resourcesContainer}
+        <Box
+
           dangerouslySetInnerHTML={resources}
+          sx={{
+            ml: 1,
+            "& > a": {
+              display: "block",
+              color: 'common.white',
+              textDecoration: "none",
+              mb: 1,
+            },
+          }}
         />
 
-        <span className={classes.flex} />
+        <Box component='span' sx={{ flex: 1 }} />
 
         <Fade in={renderImage} timeout={{ enter: 2000 }}>
           <img
@@ -120,7 +104,7 @@ export default function AppMenu({ user, drawerOpen, toggleDrawer }) {
             alt='ninja'
           />
         </Fade>
-      </div>
+      </Box>
     </Drawer>
   )
 }
