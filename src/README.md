@@ -1,4 +1,4 @@
-# Src
+# HFCS
 
 To start your Phoenix server:
 
