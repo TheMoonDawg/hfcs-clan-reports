@@ -1,8 +1,9 @@
-import React, { Component } from "react"
+import { useState } from "react"
 
 import AppMenu from "./AppMenu"
 import AppToolbar from "./AppToolbar"
-import { withStyles } from "@material-ui/core/styles"
+
+import { Box } from '@mui/material'
 
 const styles = theme => ({
   root: {
@@ -20,36 +21,41 @@ const styles = theme => ({
   toolbar: theme.mixins.toolbar,
 })
 
-class AppLayout extends Component {
-  state = { drawerOpen: false }
+export default function AppLayout({ user, onLogOut, onError, children }) {
+  const [drawerOpen, setDrawerOpen] = useState()
 
-  toggleDrawer = () =>
-    this.setState(({ drawerOpen }) => ({ drawerOpen: !drawerOpen }))
+  const toggleDrawer = () => setDrawerOpen(open => !open)
 
-  render() {
-    const { drawerOpen } = this.state
-    const { classes, user, onLogOut, onError, children } = this.props
+  return (
+    <Box sx={{
+      display: "flex",
+      zIndex: 1,
+      height: "100%",
+    }}>
+      <AppToolbar
+        user={user}
+        toggleDrawer={toggleDrawer}
+        onLogOut={onLogOut}
+        onError={onError}
+      />
+      <AppMenu
+        user={user}
+        drawerOpen={drawerOpen}
+        toggleDrawer={toggleDrawer}
+      />
+      <Box sx={{
+        flexGrow: 1,
+        backgroundColor: 'background.default',
+        p: 3,
+        minWidth: 0, // So the Typography noWrap works
+        overflow: "auto",
+      }}>
+        {/* <Box component='span' sx={{({mixins}) => ({})}} /> */}
+        {children}
+      </Box>
+    </Box>
+  )
 
-    return (
-      <div className={classes.root}>
-        <AppToolbar
-          user={user}
-          toggleDrawer={this.toggleDrawer}
-          onLogOut={onLogOut}
-          onError={onError}
-        />
-        <AppMenu
-          user={user}
-          drawerOpen={drawerOpen}
-          toggleDrawer={this.toggleDrawer}
-        />
-        <main className={classes.content}>
-          <div className={classes.toolbar} />
-          {children}
-        </main>
-      </div>
-    )
-  }
 }
 
-export default withStyles(styles)(AppLayout)
+

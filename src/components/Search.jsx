@@ -1,33 +1,22 @@
 import React, { Component } from "react"
-import Button from "@material-ui/core/Button"
-import Card from "@material-ui/core/Card"
-import CardActions from "@material-ui/core/CardActions"
-import CardContent from "@material-ui/core/CardContent"
-import CardHeader from "@material-ui/core/CardHeader"
-import MenuItem from "@material-ui/core/MenuItem"
-import TextField from "@material-ui/core/TextField"
-import { withStyles } from "@material-ui/core/styles"
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  MenuItem,
+  TextField,
+} from '@mui/material'
+
+
+
 import getReports from "../requests/getReports"
 import SearchResults from "./SearchResults"
 
-const styles = ({ spacing }) => ({
-  card: {
-    marginBottom: spacing.unit * 3,
-  },
-  textField: {
-    width: 200,
-    marginBottom: spacing.unit,
-  },
-  buttonContainer: {
-    display: "flex",
-    flexWrap: "wrap",
-  },
-  button: {
-    margin: spacing.unit / 2,
-  },
-})
 
-class Search extends Component {
+export default class Search extends Component {
   state = {
     id: "",
     name: "",
@@ -80,16 +69,19 @@ class Search extends Component {
 
   render() {
     const { id, name, region, results } = this.state
-    const { classes, user } = this.props
+    const { user } = this.props
 
     return (
       <React.Fragment>
-        <Card className={classes.card}>
+        <Card sx={{ mb: 3 }}>
           <CardHeader title='Search' />
           <CardContent>
             <TextField
               type='number'
-              className={classes.textField}
+              sx={{
+                width: 200,
+                mb: 1,
+              }}
               label='Clan Id:'
               disabled={!user}
               value={id}
@@ -99,7 +91,10 @@ class Search extends Component {
             <br />
 
             <TextField
-              className={classes.textField}
+              sx={{
+                width: 200,
+                mb: 1,
+              }}
               label='Clan Name:'
               disabled={!user}
               value={name}
@@ -109,7 +104,10 @@ class Search extends Component {
             <br />
 
             <TextField
-              className={classes.textField}
+              sx={{
+                width: 200,
+                mb: 1,
+              }}
               InputLabelProps={{ shrink: true }}
               select
               label='Region:'
@@ -127,9 +125,12 @@ class Search extends Component {
             </TextField>
           </CardContent>
           <CardActions>
-            <div className={classes.buttonContainer}>
+            <Box sx={{
+              display: "flex",
+              flexWrap: "wrap",
+            }}>
               <Button
-                className={classes.button}
+                sx={{ m: .5 }}
                 variant='contained'
                 color='primary'
                 onClick={this.onSearch}
@@ -138,7 +139,7 @@ class Search extends Component {
                 Search
               </Button>
               <Button
-                className={classes.button}
+                sx={{ m: .5 }}
                 variant='outlined'
                 onClick={this.onLast100Reports}
                 disabled={!user}
@@ -146,7 +147,7 @@ class Search extends Component {
                 Last 100 Reports
               </Button>
               <Button
-                className={classes.button}
+                sx={{ m: .5 }}
                 variant='outlined'
                 onClick={this.onLast100RegionalReports}
                 disabled={!user}
@@ -154,14 +155,14 @@ class Search extends Component {
                 Last 100 Regional Reports
               </Button>
               <Button
-                className={classes.button}
+                sx={{ m: .5 }}
                 variant='outlined'
                 onClick={this.onUserLast100Reports}
                 disabled={!user}
               >
                 Your Last 100 Reports
               </Button>
-            </div>
+            </Box>
           </CardActions>
         </Card>
 
@@ -171,4 +172,4 @@ class Search extends Component {
   }
 }
 
-export default withStyles(styles)(Search)
+

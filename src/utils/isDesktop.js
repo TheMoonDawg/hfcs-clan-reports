@@ -1,5 +1,5 @@
-import { isWidthUp } from "@material-ui/core/withWidth"
+// import { useWidth } from "@mui/material/useWidth"
 
-export default function isDesktop(width) {
-  return isWidthUp("md", width)
-}
+// export default function isDesktop(width) {
+//   return isWidthUp("md", width)
+// }

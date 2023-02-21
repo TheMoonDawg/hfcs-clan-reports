@@ -1,10 +1,10 @@
+import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles"
 import React, { Component } from "react"
 import {
   BrowserRouter,
   Route,
-  Redirect as RouterRedirect
+  Redirect as RouterRedirect,
 } from "react-router-dom"
-import { MuiThemeProvider } from "@material-ui/core/styles"
 import AppLayout from "./components/AppLayout"
 import NewReport from "./components/NewReport"
 import Redirect from "./components/Redirect"
@@ -14,7 +14,7 @@ import theme from "./theme"
 
 class App extends Component {
   state = {
-    user: null
+    user: null,
   }
 
   componentDidMount() {
@@ -23,7 +23,7 @@ class App extends Component {
     }
   }
 
-  onSetUser = user => {
+  onSetUser = (user) => {
     localStorage["user"] = JSON.stringify(user)
     this.setState({ user })
   }
@@ -40,16 +40,16 @@ class App extends Component {
     if (status === 401) this.onLogOut()
   }
 
-  onOpenSnackbar = message => this.setState({ open: true, message })
+  onOpenSnackbar = (message) => this.setState({ open: true, message })
   onCloseSnackbar = () => this.setState({ open: false })
 
   indexComponent = () => <RouterRedirect to="/search" />
 
-  searchComponent = props => (
+  searchComponent = (props) => (
     <Search user={this.state.user} onError={this.onError} {...props} />
   )
 
-  newReportComponent = props => (
+  newReportComponent = (props) => (
     <NewReport
       user={this.state.user}
       onError={this.onError}
@@ -58,7 +58,7 @@ class App extends Component {
     />
   )
 
-  redirectComponent = props => (
+  redirectComponent = (props) => (
     <Redirect onSetUser={this.onSetUser} onError={this.onError} {...props} />
   )
 
@@ -66,26 +66,34 @@ class App extends Component {
     const { user, open, message } = this.state
 
     return (
-      <MuiThemeProvider theme={theme}>
-        <BrowserRouter>
-          <AppLayout
-            user={user}
-            onLogOut={this.onLogOut}
-            onError={this.onError}
-          >
-            <Route exact path="/" component={this.indexComponent} />
-            <Route exact path="/search" component={this.searchComponent} />
-            <Route exact path="/new" component={this.newReportComponent} />
-            <Route exact path="/redirect" component={this.redirectComponent} />
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={theme}>
 
-            <Snackbar
-              open={open}
-              message={message}
-              onClose={this.onCloseSnackbar}
-            />
-          </AppLayout>
-        </BrowserRouter>
-      </MuiThemeProvider>
+          <BrowserRouter>
+            <AppLayout
+              user={user}
+              onLogOut={this.onLogOut}
+              onError={this.onError}
+            >
+              <Route exact path="/" component={this.indexComponent} />
+              <Route exact path="/search" component={this.searchComponent} />
+              <Route exact path="/new" component={this.newReportComponent} />
+              <Route
+                exact
+                path="/redirect"
+                component={this.redirectComponent}
+              />
+
+              <Snackbar
+                open={open}
+                message={message}
+                onClose={this.onCloseSnackbar}
+              />
+            </AppLayout>
+          </BrowserRouter>
+
+        </ThemeProvider>
+      </StyledEngineProvider>
     )
   }
 }

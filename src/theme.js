@@ -1,7 +1,7 @@
-import grey from "@material-ui/core/colors/grey"
-import { createMuiTheme } from "@material-ui/core/styles"
+import grey from "@mui/material/colors/grey"
+import { createTheme } from "@mui/material/styles"
 
-export default createMuiTheme({
+export default createTheme({
   palette: {
     primary: {
       light: "#209CE0",

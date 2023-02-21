@@ -1,18 +1,22 @@
 import React, { useState } from "react"
 import { Link } from "react-router-dom"
-import Divider from "@material-ui/core/Divider"
-import Drawer from "@material-ui/core/Drawer"
-import Fade from "@material-ui/core/Fade"
-import Icon from "@material-ui/core/Icon"
-import List from "@material-ui/core/List"
-import ListItem from "@material-ui/core/ListItem"
-import ListItemIcon from "@material-ui/core/ListItemIcon"
-import ListItemText from "@material-ui/core/ListItemText"
-import Typography from "@material-ui/core/Typography"
+import {
+  Divider,
+  Drawer,
+  Fade,
+  Icon,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography
+} from '@mui/material'
+
+
 import { makeStyles } from "@material-ui/core/styles"
 import useWidth from "../hooks/useWidth"
 import background from "../images/background.jpg"
-import isDesktop from "../utils/isDesktop"
+// import isDesktop from "../utils/isDesktop"
 
 const useStyles = makeStyles(({ mixins, spacing, palette }) => ({
   drawerPaper: {
@@ -55,7 +59,7 @@ export default function AppMenu({ user, drawerOpen, toggleDrawer }) {
   const [renderImage, setRenderImage] = useState(false)
 
   const resources = user ? { __html: user.resources } : null
-  const desktopMode = isDesktop(width)
+  const desktopMode = true //isDesktop(width)
   const drawerVariant = desktopMode ? "permanent" : "temporary"
 
   return (
@@ -69,7 +73,10 @@ export default function AppMenu({ user, drawerOpen, toggleDrawer }) {
     >
       {desktopMode && <div className={classes.toolbar} />}
       <List>
-        <Link className={classes.link} to='/search'>
+        <Link sx={{
+          textDecoration: "none",
+          color: "inherit",
+        }} to='/search'>
           <ListItem button>
             <ListItemIcon>
               <Icon>search</Icon>
@@ -77,7 +84,10 @@ export default function AppMenu({ user, drawerOpen, toggleDrawer }) {
             <ListItemText primary='Search' />
           </ListItem>
         </Link>
-        <Link className={classes.link} to='/new'>
+        <Link sx={{
+          textDecoration: "none",
+          color: "inherit",
+        }} to='/new'>
           <ListItem button>
             <ListItemIcon>
               <Icon>create</Icon>

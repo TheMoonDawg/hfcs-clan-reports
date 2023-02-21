@@ -1,42 +1,34 @@
 import { format, parseISO } from "date-fns/fp"
 import { flow } from "lodash"
 import React, { Component } from "react"
-import Card from "@material-ui/core/Card"
-import CardContent from "@material-ui/core/CardContent"
-import CardHeader from "@material-ui/core/CardHeader"
-import Icon from "@material-ui/core/Icon"
-import IconButton from "@material-ui/core/IconButton"
-import Table from "@material-ui/core/Table"
-import TableBody from "@material-ui/core/TableBody"
-import TableCell from "@material-ui/core/TableCell"
-import TableHead from "@material-ui/core/TableHead"
-import TableRow from "@material-ui/core/TableRow"
-import { withStyles } from "@material-ui/core/styles"
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  Icon,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from '@mui/material'
 
-const styles = ({ spacing }) => ({
-  content: {
-    overflow: "auto",
-  },
-  link: {
-    textDecoration: "none",
-  },
-  iconButton: {
-    width: spacing.unit * 4,
-    height: spacing.unit * 4,
-  },
-})
+
+
 
 const generateLink = (clanId) =>
   `https://www.bungie.net/en/ClanV2/?groupid=${clanId}`
 
-class SearchResults extends Component {
+export default class SearchResults extends Component {
   render() {
-    const { classes, title, results } = this.props
+    const { title, results } = this.props
 
     return (
       <Card>
         <CardHeader title={`${title} - ${results.length} Reports`} />
-        <CardContent className={classes.content}>
+        <CardContent sx={{ overflow: 'auto' }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -65,16 +57,17 @@ class SearchResults extends Component {
                   <TableCell padding='dense'>{row.judgment}</TableCell>
                   <TableCell padding='dense'>{row.notes}</TableCell>
                   <TableCell padding='dense'>
-                    <a
-                      className={classes.link}
+                    <Box
+                      component='a'
                       href={generateLink(row.clanId)}
                       target='_blank'
                       rel='noreferrer'
+                      sx={{ textDecoration: "none", }}
                     >
-                      <IconButton className={classes.iconButton}>
+                      <IconButton sx={{ width: 32, height: 32 }}>
                         <Icon>open_in_new</Icon>
                       </IconButton>
-                    </a>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))}
@@ -86,4 +79,4 @@ class SearchResults extends Component {
   }
 }
 
-export default withStyles(styles)(SearchResults)
+

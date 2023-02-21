@@ -1,14 +1,10 @@
 import React, { Component } from "react"
-import { withStyles } from "@material-ui/core/styles"
+
 import getClientId from "../requests/getClientId"
+import { Box } from "@mui/material"
 
-const styles = ({ palette }) => ({
-  link: {
-    color: palette.common.white
-  }
-})
 
-class LoggedOut extends Component {
+export default class LoggedOut extends Component {
   state = {}
 
   componentDidMount() {
@@ -22,7 +18,7 @@ class LoggedOut extends Component {
   }
 
   render() {
-    const { classes } = this.props
+
     const { clientId } = this.state
     const link = clientId
       ? `https://www.bungie.net/en/OAuth/Authorize?client_id=${clientId}&response_type=code`
@@ -30,12 +26,12 @@ class LoggedOut extends Component {
 
     return (
       link && (
-        <a className={classes.link} href={link}>
+        <Box component='a' href={link} sx={{ color: 'common.white' }}>
           Log In
-        </a>
+        </Box>
       )
     )
   }
 }
 
-export default withStyles(styles)(LoggedOut)
+

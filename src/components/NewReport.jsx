@@ -1,16 +1,20 @@
 import React, { Component } from "react"
 
-import Button from "@material-ui/core/Button"
-import Card from "@material-ui/core/Card"
-import CardActions from "@material-ui/core/CardActions"
-import CardContent from "@material-ui/core/CardContent"
-import CardHeader from "@material-ui/core/CardHeader"
-import Icon from "@material-ui/core/Icon"
-import IconButton from "@material-ui/core/IconButton"
-import MenuItem from "@material-ui/core/MenuItem"
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Icon, Tooltip,
+  IconButton, TextField,
+  MenuItem,
+} from '@mui/material'
+
+
 import SearchResults from "./SearchResults"
-import TextField from "@material-ui/core/TextField"
-import Tooltip from "@material-ui/core/Tooltip"
+
+
 import classnames from "classnames"
 import createReport from "../requests/createReport"
 import getClanData from "../requests/getClanData"

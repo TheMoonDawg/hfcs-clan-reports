@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react"
-import MUISnackbar from "@material-ui/core/Snackbar"
+import { Snackbar as MUISnackbar } from "@mui/material"
 
 class Snackbar extends PureComponent {
   onClose = (_e, reason) => {
