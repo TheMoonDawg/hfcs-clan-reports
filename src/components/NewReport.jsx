@@ -1,124 +1,62 @@
-import React, { Component } from "react"
-
 import {
   Button,
   Card,
   CardActions,
   CardContent,
   CardHeader,
-  Icon, Tooltip,
-  IconButton, TextField,
+  Grid,
+  Icon,
+  IconButton,
   MenuItem,
+  Stack,
+  TextField,
+  Tooltip,
 } from '@mui/material'
-
-
-import SearchResults from "./SearchResults"
-
-
-import classnames from "classnames"
-import createReport from "../requests/createReport"
-import getClanData from "../requests/getClanData"
-import getReports from "../requests/getReports"
-import { withStyles } from "@material-ui/core/styles"
-
-const placeholderText =
-  "Ex:\nClan Reported:\nCLAN NAME (id: 123456)\n\nClan Motto:\nCLAN MOTTO\n\nClan Mission Statement:\nCLAN MISSION STATEMENT"
+import { useEffect, useRef, useState } from 'react'
+import { createReport, getClanData, getReports } from '../api'
+import SearchResults from './SearchResults'
 
 const parseText = (report, regex) => {
   const value = regex.exec(report)
-  return value ? value[1] : ""
+  return value ? value[1] : ''
 }
 
-const styles = ({ spacing, palette, breakpoints }) => ({
-  card: {
-    marginBottom: spacing.unit * 3,
-  },
-  container: {
-    display: "flex",
-    [breakpoints.down("md")]: { display: "block" },
-  },
-  reportContainer: {
-    flex: 2,
-    maxWidth: 600,
-  },
-  flex: {
-    flex: 1,
-  },
-  margin: {
-    marginBottom: spacing.unit,
-  },
-  textField200: {
-    maxWidth: 200,
-  },
-  textField400: {
-    maxWidth: 400,
-  },
-  textBoxContainer: {
-    background: palette.secondary.main,
-    borderRadius: 4,
-    padding: spacing.unit,
-  },
-  parserContainer: {
-    width: 250,
-  },
-  textFieldParser: {
-    width: "100%",
-  },
-  parserClanIdContainer: {
-    display: "flex",
-    alignItems: "center",
-  },
-  iconButton: {
-    width: spacing.unit * 4,
-    height: spacing.unit * 4,
-  },
-})
-
-const initState = {
-  judgment: "Warning",
-  id: "",
-  name: "",
-  motto: "",
-  missionStatement: "",
-  notes: "",
-  parserClanId: "",
-  parserQueue: placeholderText,
-  required: false,
-  results: null,
+const DEFAULT_VALUES = {
+  judgment: 'Warning',
+  id: '',
+  name: '',
+  motto: '',
+  missionStatement: '',
+  notes: '',
+  region: '',
 }
 
-class NewReport extends Component {
-  state = {
-    ...initState,
-  }
+const PLACEHOLDER_TEXT =
+  'Ex:\nClan Reported:\nCLAN NAME (id: 123456)\n\nClan Motto:\nCLAN MOTTO\n\nClan Mission Statement:\nCLAN MISSION STATEMENT'
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.user && !prevState.region) {
-      return { region: nextProps.user.region }
+export default function NewReport({ user, onError, onOpenSnackbar }) {
+  const [
+    { judgment, id, name, motto, missionStatement, notes, region },
+    setForm,
+  ] = useState(DEFAULT_VALUES)
+  const [parserClanId, setParserClanId] = useState('')
+  const [results, setResults] = useState(null)
+  const [errored, setErrored] = useState(false)
+
+  const queueRef = useRef()
+
+  useEffect(() => {
+    if (user && !region) {
+      setForm((form) => ({ ...form, region: user.region }))
     }
+  }, [user, region])
 
-    return null
+  const onFormChange = (key) => (event) => {
+    setForm((form) => ({ ...form, [key]: event.target.value }))
   }
 
-  getInitState = () => ({
-    ...initState,
-    region: this.props.user.region,
-  })
-
-  onChange = key => event => this.setState({ [key]: event.target.value })
-  onJudgmentChange = this.onChange("judgment")
-  onIdChange = this.onChange("id")
-  onNameChange = this.onChange("name")
-  onMottoChange = this.onChange("motto")
-  onMissionStatementChange = this.onChange("missionStatement")
-  onNotesChange = this.onChange("notes")
-  onRegionChange = this.onChange("region")
-  onParserClanIdChange = this.onChange("parserClanId")
-
-  onFocus = () => this.setState({ parserQueue: "" })
-  onBlur = () => this.setState({ parserQueue: placeholderText })
-  onParse = e => {
-    const report = e.target.value.split(" \n").join("\n")
+  const onParse = (e) => {
+    const report = e.target.value.split(' \n').join('\n')
 
     // RegEx for matching
     const idMatch = /[\s\S]*\(id: (.*)\)/
@@ -128,298 +66,227 @@ class NewReport extends Component {
 
     const clanId = parseText(report, idMatch)
 
-    this.setState({
-      ...this.getInitState(),
+    setForm({
+      ...DEFAULT_VALUES,
       id: clanId,
       name: parseText(report, nameMatch),
       motto: parseText(report, mottoMatch),
       missionStatement: parseText(report, statementMatch),
     })
 
-    this.inputRef.blur()
+    queueRef.current.blur()
 
-    if (clanId) this.onFetchReports(clanId)
+    if (clanId) {
+      onFetchReports(clanId)
+    }
   }
 
-  onIdBlur = () => this.onFetchReports(this.state.id)
+  const onIdBlur = () => {
+    if (id.trim()) {
+      onFetchReports(id)
+    }
+  }
 
-  onFetchClanData = () => {
-    const { parserClanId } = this.state
-    const { user, onError } = this.props
-
+  const onFetchClanData = () => {
     getClanData(user, parserClanId)
-      .then(result => {
-        this.setState({ ...this.getInitState(), ...result })
-        this.onFetchReports(result.id)
+      .then((result) => {
+        setForm({ ...DEFAULT_VALUES, ...result })
+        onFetchReports(result.id)
       })
       .catch(onError)
   }
 
-  onFetchReports = clanId => {
-    const { user, onError } = this.props
-
-    this.setState({ results: null })
+  const onFetchReports = (clanId) => {
+    setResults(null)
 
     getReports(user, { clan_id: clanId })
-      .then(result => {
-        this.setState({ results: result })
-      })
+      .then((results) => setResults(results))
       .catch(onError)
   }
 
-  onCreateReport = () => {
-    const {
-      id,
-      name,
-      motto,
-      missionStatement,
-      notes,
-      judgment,
-      region,
-    } = this.state
-    const { user, onOpenSnackbar, onError } = this.props
-
+  const onCreateReport = () => {
     if (!id.trim() || !name.trim()) {
-      this.setState({ required: true })
-      return
+      setErrored(true)
     } else {
-      this.setState({ required: false })
-    }
+      setErrored(false)
 
-    const body = {
-      id,
-      name,
-      motto,
-      missionStatement,
-      notes,
-      judgment,
-      region,
-    }
+      const body = {
+        id,
+        name,
+        motto,
+        missionStatement,
+        notes,
+        judgment,
+        region,
+      }
 
-    createReport(user, body)
-      .then(() => {
-        onOpenSnackbar("Report successfully added!")
-        this.setState(this.getInitState())
-      })
-      .catch(onError)
+      createReport(user, body)
+        .then(() => {
+          onOpenSnackbar('Report successfully added!')
+          setForm(DEFAULT_VALUES)
+          setParserClanId('')
+          setResults(null)
+        })
+        .catch(onError)
+    }
   }
 
-  render() {
-    const {
-      judgment,
-      id,
-      name,
-      motto,
-      missionStatement,
-      notes,
-      region,
-      parserClanId,
-      parserQueue,
-      required,
-      results,
-    } = this.state
-    const { classes, user } = this.props
-    const userName = user ? user.name : null
+  return (
+    <>
+      <Card sx={{ mb: 2 }}>
+        <CardHeader title={user?.name} />
 
-    return (
-      <React.Fragment>
-        <Card className={classes.card}>
-          <CardHeader title={userName} />
-          <CardContent>
-            <div className={classes.container}>
-              <div className={classes.reportContainer}>
-                {/* Judgment */}
+        <CardContent>
+          <Stack direction='row' justifyContent='space-between'>
+            {/* Form */}
+            <Grid container columnSpacing={1} sx={{ width: 600 }}>
+              <Grid item xs={4}>
                 <TextField
-                  className={classnames(classes.margin, classes.textField200)}
                   fullWidth
-                  InputLabelProps={{ shrink: true }}
                   select
-                  label="Judgment:"
+                  label='Judgment:'
                   disabled={!user}
                   value={judgment}
-                  onChange={this.onJudgmentChange}
+                  onChange={onFormChange('judgment')}
                 >
-                  <MenuItem value="Warning">Warning</MenuItem>
-                  <MenuItem value="7 Day Ban">7 Day Ban</MenuItem>
-                  <MenuItem value="30 Day Ban">30 Day Ban</MenuItem>
-                  <MenuItem value="Permanent Ban">Permanent Ban</MenuItem>
+                  <MenuItem value='Warning'>Warning</MenuItem>
+                  <MenuItem value='7 Day Ban'>7 Day Ban</MenuItem>
+                  <MenuItem value='30 Day Ban'>30 Day Ban</MenuItem>
+                  <MenuItem value='Permanent Ban'>Permanent Ban</MenuItem>
                 </TextField>
+              </Grid>
 
-                <br />
-
-                {/* Clan Id */}
+              <Grid item xs={4}>
                 <TextField
-                  type="number"
-                  className={classnames(classes.margin, classes.textField200)}
                   fullWidth
-                  label="Clan Id:"
-                  required={required}
-                  error={required}
-                  disabled={!user}
-                  value={id}
-                  onChange={this.onIdChange}
-                  onBlur={this.onIdBlur}
-                />
-
-                <br />
-
-                {/* Clan Name */}
-                <TextField
-                  className={classnames(classes.margin, classes.textField400)}
-                  fullWidth
-                  label="Clan Name:"
-                  required={required}
-                  error={required}
-                  disabled={!user}
-                  value={name}
-                  onChange={this.onNameChange}
-                />
-
-                <br />
-
-                {/* Clan Motto */}
-                <TextField
-                  className={classnames(classes.margin, classes.textField400)}
-                  fullWidth
-                  label="Clan Motto:"
-                  disabled={!user}
-                  value={motto}
-                  onChange={this.onMottoChange}
-                />
-
-                <br />
-
-                {/* Clan Mission Statement */}
-                <div
-                  className={classnames(
-                    classes.margin,
-                    classes.textBoxContainer,
-                  )}
-                >
-                  <TextField
-                    fullWidth
-                    multiline
-                    rowsMax={6}
-                    label="Clan Mission Statement:"
-                    disabled={!user}
-                    value={missionStatement}
-                    onChange={this.onMissionStatementChange}
-                  />
-                </div>
-
-                {/* Notes */}
-                <div className={classes.textBoxContainer}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rowsMax={6}
-                    label="Notes:"
-                    disabled={!user}
-                    value={notes}
-                    onChange={this.onNotesChange}
-                  />
-                </div>
-
-                <br />
-
-                {/* Region */}
-                <TextField
-                  className={classnames(classes.margin, classes.textField200)}
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
                   select
-                  label="Region:"
+                  label='Region:'
                   disabled={!user}
                   value={region}
-                  onChange={this.onRegionChange}
+                  onChange={onFormChange('region')}
                 >
-                  <MenuItem value="English">English</MenuItem>
-                  <MenuItem value="French">French</MenuItem>
-                  <MenuItem value="German">German</MenuItem>
-                  <MenuItem value="Italian">Italian</MenuItem>
-                  <MenuItem value="Polish">Polish</MenuItem>
-                  <MenuItem value="Portuguese">Portuguese</MenuItem>
-                  <MenuItem value="Spanish">Spanish</MenuItem>
+                  <MenuItem value='English'>English</MenuItem>
+                  <MenuItem value='French'>French</MenuItem>
+                  <MenuItem value='German'>German</MenuItem>
+                  <MenuItem value='Italian'>Italian</MenuItem>
+                  <MenuItem value='Polish'>Polish</MenuItem>
+                  <MenuItem value='Portuguese'>Portuguese</MenuItem>
+                  <MenuItem value='Spanish'>Spanish</MenuItem>
                 </TextField>
-              </div>
+              </Grid>
 
-              <span className={classes.flex} />
+              <Grid item xs={4}>
+                <TextField
+                  type='number'
+                  fullWidth
+                  label='Clan Id:'
+                  required
+                  error={errored}
+                  disabled={!user}
+                  value={id}
+                  onChange={onFormChange('id')}
+                  onBlur={onIdBlur}
+                />
+              </Grid>
 
-              {/* Parsers */}
-              <div className={classes.parserContainer}>
-                {/* Clan Id Parser */}
-                <div className={classes.parserClanIdContainer}>
-                  <TextField
-                    type="number"
-                    className={classnames(
-                      classes.margin,
-                      classes.textFieldParser,
-                    )}
-                    label="Parser (Clan Id):"
-                    disabled={!user}
-                    value={parserClanId}
-                    onChange={this.onParserClanIdChange}
-                  />
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label='Clan Name:'
+                  required
+                  error={errored}
+                  disabled={!user}
+                  value={name}
+                  onChange={onFormChange('name')}
+                />
+              </Grid>
 
-                  <Tooltip
-                    title="Get Clan Data"
-                    disableFocusListener={!user}
-                    disableTouchListener={!user}
-                    disableHoverListener={!user}
-                  >
-                    <div>
-                      <IconButton
-                        className={classes.iconButton}
-                        disabled={!user}
-                        onClick={this.onFetchClanData}
-                      >
-                        <Icon>search</Icon>
-                      </IconButton>
-                    </div>
-                  </Tooltip>
-                </div>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label='Clan Motto:'
+                  disabled={!user}
+                  value={motto}
+                  onChange={onFormChange('motto')}
+                />
+              </Grid>
 
-                <br />
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rowsMax={6}
+                  label='Clan Mission Statement:'
+                  disabled={!user}
+                  value={missionStatement}
+                  onChange={onFormChange('missionStatement')}
+                />
+              </Grid>
 
-                {/* Report Queue Parser */}
-                <div className={classes.textBoxContainer}>
-                  <TextField
-                    className={classes.textFieldParser}
-                    inputRef={ref => (this.inputRef = ref)}
-                    label="Parser (Report Queue):"
-                    multiline
-                    rows={9}
-                    value={parserQueue}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    disabled={!user}
-                    onFocus={this.onFocus}
-                    onBlur={this.onBlur}
-                    onChange={this.onParse}
-                  />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-          <CardActions>
-            <Button
-              variant="raised"
-              color="primary"
-              disabled={!user}
-              onClick={this.onCreateReport}
-            >
-              Create Report
-            </Button>
-          </CardActions>
-        </Card>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rowsMax={6}
+                  label='Notes:'
+                  disabled={!user}
+                  value={notes}
+                  onChange={onFormChange('notes')}
+                />
+              </Grid>
+            </Grid>
 
-        {results && (
-          <SearchResults title="Previous Offenses" results={results} />
-        )}
-      </React.Fragment>
-    )
-  }
+            {/* Parsers */}
+            <Stack spacing={2}>
+              <Stack direction='row' spacing={1}>
+                <TextField
+                  type='number'
+                  label='Parser (Clan Id):'
+                  disabled={!user}
+                  value={parserClanId}
+                  onChange={(e) => setParserClanId(e.target.value)}
+                />
+
+                <Tooltip
+                  title='Get Clan Data'
+                  disableFocusListener={!user}
+                  disableTouchListener={!user}
+                  disableHoverListener={!user}
+                >
+                  <span>
+                    <IconButton disabled={!user} onClick={onFetchClanData}>
+                      <Icon>search</Icon>
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </Stack>
+
+              <TextField
+                ref={queueRef}
+                label='Parser (Report Queue):'
+                multiline
+                rows={9}
+                placeholder={PLACEHOLDER_TEXT}
+                disabled={!user}
+                onChange={onParse}
+              />
+            </Stack>
+          </Stack>
+        </CardContent>
+
+        <CardActions>
+          <Button
+            variant='contained'
+            color='primary'
+            disabled={!user}
+            onClick={onCreateReport}
+          >
+            Create Report
+          </Button>
+        </CardActions>
+      </Card>
+
+      {results && <SearchResults title='Previous Offenses' results={results} />}
+    </>
+  )
 }
-
-export default withStyles(styles)(NewReport)

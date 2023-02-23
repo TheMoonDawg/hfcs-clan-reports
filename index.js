@@ -1,17 +1,20 @@
+/* eslint-disable import/no-commonjs */
+
 // Imports
-const express = require("express")
-const nodeFetch = require("node-fetch")
-const path = require("path")
+const express = require('express')
+const nodeFetch = require('node-fetch')
 // const csParse = require("pg-connection-string").parse
-const { Pool } = require("pg")
-const { v4: uuidv4 } = require("uuid")
+const { Pool } = require('pg')
+const { v4: uuidv4 } = require('uuid')
+const path = require('path')
+
 const app = express()
 
 // Config
 let bungieConfig
 
 try {
-  bungieConfig = require("./keys.json")
+  bungieConfig = require('./keys.json')
 } catch (e) {
   // Use environment variables instead
 }
@@ -27,27 +30,27 @@ function fetch(url, options) {
 
 // Request Options
 const getAuthorizationRequestOptions = (code) => ({
-  method: "POST",
+  method: 'POST',
   headers: {
-    "X-API-Key": apiKey,
-    "Content-Type": "application/x-www-form-urlencoded",
+    'X-API-Key': apiKey,
+    'Content-Type': 'application/x-www-form-urlencoded',
   },
   body: `grant_type=authorization_code&code=${code}&client_id=${clientId}&client_secret=${clientSecret}`,
 })
 
 const getRefreshRequestOptions = (refreshToken) => ({
-  method: "POST",
+  method: 'POST',
   headers: {
-    "X-API-Key": apiKey,
-    "Content-Type": "application/x-www-form-urlencoded",
+    'X-API-Key': apiKey,
+    'Content-Type': 'application/x-www-form-urlencoded',
   },
   body: `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`,
 })
 
 const getRequestOptions = (accessToken) => ({
-  method: "GET",
+  method: 'GET',
   headers: {
-    "X-API-Key": apiKey,
+    'X-API-Key': apiKey,
     Authorization: `Bearer ${accessToken}`,
   },
 })
@@ -73,10 +76,10 @@ function getErrorMessage(statusCode) {
     case UNAUTHORIZED:
       return "Hey, you're not allowed to be here. Shoo!"
     case NOT_FOUND:
-      return "Clan not found!"
+      return 'Clan not found!'
     case SERVER_ERROR:
     default:
-      return "An internal server error has occurred... yell at MoonDawg to fix it."
+      return 'An internal server error has occurred... yell at MoonDawg to fix it.'
   }
 }
 
@@ -84,10 +87,10 @@ function getAuthToken(request) {
   return request.headers.authorization.substring(6)
 }
 
-app.set("port", process.env.PORT || 5001)
+app.set('port', process.env.PORT || 5001)
 
-app.listen(app.get("port"), () => {
-  console.log("Node app is running on port", app.get("port"))
+app.listen(app.get('port'), () => {
+  console.log('Node app is running on port', app.get('port'))
 })
 
 // ---------------------------
@@ -95,9 +98,9 @@ app.listen(app.get("port"), () => {
 // ---------------------------
 
 // Serve React files
-app.use(express.static(path.join(__dirname, "dist")))
-app.get(["/", "/search", "/new", "/redirect"], (_request, response) => {
-  response.sendFile(path.join(__dirname, "dist/index.html"))
+app.use(express.static(path.join(__dirname, 'dist')))
+app.get(['/', '/search', '/new', '/redirect'], (_request, response) => {
+  response.sendFile(path.join(__dirname, 'dist/index.html'))
 })
 
 // ---------------------------
@@ -105,20 +108,20 @@ app.get(["/", "/search", "/new", "/redirect"], (_request, response) => {
 // ---------------------------
 
 // Get Client Id
-app.get("/api/client_id", (_request, response) => {
+app.get('/api/client_id', (_request, response) => {
   response.statusCode = OK
   response.send(clientId)
 })
 
 // Login
-app.get("/api/login", async (request, response) => {
+app.get('/api/login', async (request, response) => {
   try {
     const cookieToken = uuidv4()
 
     const options = getAuthorizationRequestOptions(request.query.code)
     const { access_token, refresh_token } = await fetch(
-      "https://www.bungie.net/platform/app/oauth/token/",
-      options
+      'https://www.bungie.net/platform/app/oauth/token/',
+      options,
     )
 
     const resp = await getUser(access_token)
@@ -127,9 +130,9 @@ app.get("/api/login", async (request, response) => {
     const model = generateModel(user, cookieToken, access_token, refresh_token)
 
     const { region } = await executeSingleQuery(
-      "SELECT * FROM ninja WHERE ninja_id=$1",
+      'SELECT * FROM ninja WHERE ninja_id=$1',
       [model.membershipId],
-      UNAUTHORIZED
+      UNAUTHORIZED,
     )
 
     // Update tokens in database
@@ -137,7 +140,7 @@ app.get("/api/login", async (request, response) => {
       model.membershipId,
       model.cookieToken,
       access_token,
-      refresh_token
+      refresh_token,
     )
 
     response.statusCode = OK
@@ -152,7 +155,7 @@ app.get("/api/login", async (request, response) => {
 })
 
 // Search Clan Reports
-app.get("/api/search", async (request, response) => {
+app.get('/api/search', async (request, response) => {
   try {
     const queryString = request.query
     const token = getAuthToken(request)
@@ -201,14 +204,14 @@ app.get("/api/search", async (request, response) => {
       values.push(membershipId)
     }
 
-    query += " ORDER BY r.report_date DESC"
+    query += ' ORDER BY r.report_date DESC'
 
     if (
       queryString.last_100_reports ||
       queryString.last_100_regional_reports ||
       queryString.user_100_reports
     ) {
-      query += " LIMIT 100"
+      query += ' LIMIT 100'
     }
 
     const data = await executeQuery(query, values)
@@ -225,7 +228,7 @@ app.get("/api/search", async (request, response) => {
 })
 
 // Get Clan info from Bnet
-app.get("/api/clan", async (request, response) => {
+app.get('/api/clan', async (request, response) => {
   try {
     const clanId = request.query.clan_id
 
@@ -236,10 +239,10 @@ app.get("/api/clan", async (request, response) => {
 
     const clanInfo = await fetch(
       `https://www.bungie.net/Platform/GroupV2/${clanId}`,
-      options
+      options,
     )
 
-    if (clanInfo.ErrorStatus === "GroupNotFound") {
+    if (clanInfo.ErrorStatus === 'GroupNotFound') {
       throw NOT_FOUND
     }
 
@@ -264,7 +267,7 @@ app.get("/api/clan", async (request, response) => {
 })
 
 // New Clan Report
-app.post("/api/new", async (request, response) => {
+app.post('/api/new', async (request, response) => {
   try {
     const token = getAuthToken(request)
     const { membershipId } = await getNinja(token)
@@ -314,8 +317,8 @@ async function getNinja(cookieToken) {
     // Invalid Access Token - Use Refresh Token
     const options = getRefreshRequestOptions(refresh_token)
     const tokens = await fetch(
-      "https://www.bungie.net/platform/app/oauth/token/",
-      options
+      'https://www.bungie.net/platform/app/oauth/token/',
+      options,
     )
 
     const resp = await getUser(tokens.access_token)
@@ -326,20 +329,20 @@ async function getNinja(cookieToken) {
       user.membershipId,
       cookieToken,
       tokens.access_token,
-      tokens.refresh_token
+      tokens.refresh_token,
     )
 
     model = generateModel(
       user,
       cookieToken,
       tokens.access_token,
-      tokens.refresh_token
+      tokens.refresh_token,
     )
   }
 
   const results = await executeQuery(
-    "SELECT display_name FROM ninja WHERE ninja_id = $1 AND active",
-    [model.membershipId]
+    'SELECT display_name FROM ninja WHERE ninja_id = $1 AND active',
+    [model.membershipId],
   )
 
   if (results.length === 0) {
@@ -353,15 +356,15 @@ function getUser(accessToken) {
   const options = getRequestOptions(accessToken)
 
   return fetch(
-    "https://www.bungie.net/Platform/User/GetCurrentBungieAccount/",
-    options
+    'https://www.bungie.net/Platform/User/GetCurrentBungieAccount/',
+    options,
   )
 }
 
 async function getAccessTokens(cookieToken) {
   const data = await executeQuery(
-    "SELECT * FROM token WHERE cookie_token=$1;",
-    [cookieToken]
+    'SELECT * FROM token WHERE cookie_token=$1;',
+    [cookieToken],
   )
 
   if (data.length === 0) {
@@ -377,37 +380,37 @@ async function updateTokens(
   membershipId,
   cookieToken,
   accessToken,
-  refreshToken
+  refreshToken,
 ) {
   const data = await executeQuery(
-    "SELECT ninja_id FROM token WHERE ninja_id=$1",
-    [membershipId]
+    'SELECT ninja_id FROM token WHERE ninja_id=$1',
+    [membershipId],
   )
 
   if (data.length > 0) {
     // Update Tokens
     await executeQuery(
-      "UPDATE token SET access_token=$1, refresh_token=$2, cookie_token=$3 WHERE ninja_id=$4",
-      [accessToken, refreshToken, cookieToken, membershipId]
+      'UPDATE token SET access_token=$1, refresh_token=$2, cookie_token=$3 WHERE ninja_id=$4',
+      [accessToken, refreshToken, cookieToken, membershipId],
     )
   } else {
     // Insert Tokens
     await executeQuery(
-      "INSERT INTO token(ninja_id, access_token, refresh_token, cookie_token) VALUES($1, $2, $3, $4);",
-      [membershipId, accessToken, refreshToken, cookieToken]
+      'INSERT INTO token(ninja_id, access_token, refresh_token, cookie_token) VALUES($1, $2, $3, $4);',
+      [membershipId, accessToken, refreshToken, cookieToken],
     )
   }
 }
 
 function parseBody(request) {
   return new Promise((resolve) => {
-    let body = ""
+    let body = ''
 
     request
-      .on("data", (chunk) => {
+      .on('data', (chunk) => {
         body += chunk
       })
-      .on("end", () => {
+      .on('end', () => {
         const data = JSON.parse(body)
 
         resolve(data)
@@ -434,7 +437,7 @@ async function executeQuery(query, params) {
   }
 }
 
-async function executeSingleQuery(query, params, exceptionType = SERVER_ERROR) {
+async function executeSingleQuery(query, params) {
   const data = await executeQuery(query, params)
 
   if (data.length === 0) {

@@ -1,37 +1,28 @@
-import queryString from "query-string"
-import React, { Component } from "react"
-import { Redirect as RouterRedirect } from "react-router-dom"
-import { Typography } from "@mui/material"
-import logIn from "../requests/logIn"
+import { Typography } from '@mui/material'
+import queryString from 'query-string'
+import { useEffect, useState } from 'react'
+import { Redirect as RouterRedirect } from 'react-router-dom'
+import { logIn } from '../api'
 
-class Redirect extends Component {
-  state = {
-    redirect: false
-  }
+export default function Redirect({ user, onSetUser, onError, location }) {
+  const [redirect, setRedirect] = useState(false)
+  const { code } = queryString.parse(location.search)
 
-  componentDidMount() {
-    const { onSetUser, onError } = this.props
-    const { code } = queryString.parse(this.props.location.search)
-
-    if (code && !localStorage.hasOwnProperty("user")) {
-      logIn(code)
-        .then(onSetUser)
-        .catch(onError)
-        .then(this.redirect)
+  useEffect(() => {
+    if (code && !localStorage.getItem('user')) {
+      logIn(code).then(onSetUser).catch(onError)
     }
-  }
+  }, [code])
 
-  redirect = () => this.setState({ redirect: true })
+  useEffect(() => {
+    if (user) {
+      setRedirect(true)
+    }
+  }, [user])
 
-  render() {
-    const { redirect } = this.state
-
-    return redirect ? (
-      <RouterRedirect to="/search" />
-    ) : (
-      <Typography variant="title">Logging In...</Typography>
-    )
-  }
+  return redirect ? (
+    <RouterRedirect to='/search' />
+  ) : (
+    <Typography variant='title'>Logging In...</Typography>
+  )
 }
-
-export default Redirect

@@ -1,5 +1,3 @@
-import React, { useState } from "react"
-import { Link } from "react-router-dom"
 import {
   Box,
   Divider,
@@ -8,86 +6,87 @@ import {
   Icon,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
-  Typography
+  Typography,
 } from '@mui/material'
-
-
-// import useWidth from "../hooks/useWidth"
-import background from "../images/background.jpg"
-// import isDesktop from "../utils/isDesktop"
-
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import background from '../images/background.jpg'
 
 export default function AppMenu({ user, drawerOpen, toggleDrawer }) {
-
   // const width = useWidth()
 
   const [renderImage, setRenderImage] = useState(false)
 
   const resources = user ? { __html: user.resources } : null
   const desktopMode = true //isDesktop(width)
-  const drawerVariant = desktopMode ? "permanent" : "temporary"
+  const drawerVariant = desktopMode ? 'permanent' : 'temporary'
 
   return (
     <Drawer
       open={drawerOpen}
       onClose={toggleDrawer}
       variant={drawerVariant}
-      // classes={{
-      //   paper: classes.drawerPaper,
-      // }}
       sx={{
-        position: "relative",
+        position: 'relative',
         width: 240,
       }}
     >
-      {desktopMode && <Box sx={theme => theme.mixins.toolbar} />}
+      {desktopMode && <Box sx={(theme) => theme.mixins.toolbar} />}
       <List>
-        <Link sx={{
-          textDecoration: "none",
-          color: "inherit",
-        }} to='/search'>
-          <ListItem button>
+        <ListItem
+          component={Link}
+          to='/search'
+          disablePadding
+          sx={{ color: 'common.white' }}
+        >
+          <ListItemButton>
             <ListItemIcon>
               <Icon>search</Icon>
             </ListItemIcon>
             <ListItemText primary='Search' />
-          </ListItem>
-        </Link>
-        <Link sx={{
-          textDecoration: "none",
-          color: "inherit",
-        }} to='/new'>
-          <ListItem button>
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem
+          component={Link}
+          to='/new'
+          disablePadding
+          sx={{ color: 'common.white' }}
+        >
+          <ListItemButton>
             <ListItemIcon>
               <Icon>create</Icon>
             </ListItemIcon>
             <ListItemText primary='New Report' />
-          </ListItem>
-        </Link>
+          </ListItemButton>
+        </ListItem>
       </List>
+
       <Divider />
-      <List />
-      <Box sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-      }}>
+
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+        }}
+      >
         {user && (
           <Typography variant='headline' sx={{ ml: 1, mb: 3 }}>
             Resources
           </Typography>
         )}
         <Box
-
           dangerouslySetInnerHTML={resources}
           sx={{
             ml: 1,
-            "& > a": {
-              display: "block",
+            '& > a': {
+              display: 'block',
               color: 'common.white',
-              textDecoration: "none",
+              textDecoration: 'none',
               mb: 1,
             },
           }}

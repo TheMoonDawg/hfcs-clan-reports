@@ -1,28 +1,23 @@
-import React, { PureComponent } from "react"
-import { Snackbar as MUISnackbar } from "@mui/material"
+import { Snackbar as MUISnackbar } from '@mui/material'
 
-class Snackbar extends PureComponent {
-  onClose = (_e, reason) => {
-    if (reason === "timeout") this.props.onClose()
+export default function Snackbar({ open, message, onClose }) {
+  const handleClose = (_e, reason) => {
+    if (reason === 'timeout') {
+      onClose()
+    }
   }
 
-  render() {
-    const { open, message } = this.props
-
-    return (
-      <MUISnackbar
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right"
-        }}
-        open={open}
-        message={message}
-        autoHideDuration={5000}
-        disableWindowBlurListener
-        onClose={this.onClose}
-      />
-    )
-  }
+  return (
+    <MUISnackbar
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}
+      open={open}
+      message={message}
+      autoHideDuration={5000}
+      disableWindowBlurListener
+      onClose={handleClose}
+    />
+  )
 }
-
-export default Snackbar

@@ -1,119 +1,91 @@
-import React, { Component } from "react"
 import {
-  Box,
   Button,
   Card,
   CardActions,
   CardContent,
   CardHeader,
   MenuItem,
+  Stack,
   TextField,
 } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { getReports } from '../api'
+import SearchResults from './SearchResults'
 
+export default function Search({ user, onError }) {
+  const [clanId, setClanId] = useState('')
+  const [clanName, setClanName] = useState('')
+  const [region, setRegion] = useState('')
+  const [results, setResults] = useState(null)
 
-
-import getReports from "../requests/getReports"
-import SearchResults from "./SearchResults"
-
-
-export default class Search extends Component {
-  state = {
-    id: "",
-    name: "",
-  }
-
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.user && !prevState.region) {
-      return { region: nextProps.user.region }
+  useEffect(() => {
+    if (user && !region) {
+      setRegion(user.region)
     }
+  }, [user, region])
 
-    return null
-  }
-
-  onChange = (key) => (event) => this.setState({ [key]: event.target.value })
-  onIdChange = this.onChange("id")
-  onNameChange = this.onChange("name")
-  onRegionChange = this.onChange("region")
-
-  onFetchReports = (params) => {
-    const { user, onError } = this.props
-
+  const onFetchReports = (params) => {
     getReports(user, params)
-      .then((result) => {
-        this.setState({ results: result })
-      })
+      .then((results) => setResults(results))
       .catch(onError)
   }
 
-  onSearch = () => {
-    const { id, name } = this.state
-    const params = { clan_id: id.trim(), clan_name: name.trim() }
-    this.onFetchReports(params)
+  const onSearch = () => {
+    const params = {
+      region,
+      clan_id: clanId.trim(),
+      clan_name: clanName.trim(),
+    }
+    onFetchReports(params)
   }
 
-  onLast100Reports = () => {
+  const onLast100Reports = () => {
     const params = { last_100_reports: true }
-    this.onFetchReports(params)
+    onFetchReports(params)
   }
 
-  onLast100RegionalReports = () => {
-    const { region } = this.state
+  const onLast100RegionalReports = () => {
     const params = { region, last_100_regional_reports: true }
-    this.onFetchReports(params)
+    onFetchReports(params)
   }
 
-  onUserLast100Reports = () => {
+  const onUserLast100Reports = () => {
     const params = { user_100_reports: true }
-    this.onFetchReports(params)
+    onFetchReports(params)
   }
 
-  render() {
-    const { id, name, region, results } = this.state
-    const { user } = this.props
+  return (
+    <>
+      <Card sx={{ mb: 2 }}>
+        <CardHeader title='Search' />
 
-    return (
-      <React.Fragment>
-        <Card sx={{ mb: 3 }}>
-          <CardHeader title='Search' />
-          <CardContent>
+        <CardContent>
+          <Stack direction='row' spacing={1}>
             <TextField
               type='number'
-              sx={{
-                width: 200,
-                mb: 1,
-              }}
-              label='Clan Id:'
+              label='Clan ID'
               disabled={!user}
-              value={id}
-              onChange={this.onIdChange}
+              value={clanId}
+              onChange={(e) => setClanId(e.target.value)}
+              sx={{ width: 200 }}
             />
 
-            <br />
-
             <TextField
-              sx={{
-                width: 200,
-                mb: 1,
-              }}
-              label='Clan Name:'
+              type='number'
+              label='Clan Name'
               disabled={!user}
-              value={name}
-              onChange={this.onNameChange}
+              value={clanName}
+              onChange={(e) => setClanName(e.target.value)}
+              sx={{ width: 300 }}
             />
 
-            <br />
-
             <TextField
-              sx={{
-                width: 200,
-                mb: 1,
-              }}
-              InputLabelProps={{ shrink: true }}
               select
-              label='Region:'
+              label='Region'
               disabled={!user}
               value={region}
-              onChange={this.onRegionChange}
+              onChange={(e) => setRegion(e.target.value)}
+              sx={{ width: 200 }}
             >
               <MenuItem value='English'>English</MenuItem>
               <MenuItem value='French'>French</MenuItem>
@@ -123,53 +95,48 @@ export default class Search extends Component {
               <MenuItem value='Portuguese'>Portuguese</MenuItem>
               <MenuItem value='Spanish'>Spanish</MenuItem>
             </TextField>
-          </CardContent>
-          <CardActions>
-            <Box sx={{
-              display: "flex",
-              flexWrap: "wrap",
-            }}>
-              <Button
-                sx={{ m: .5 }}
-                variant='contained'
-                color='primary'
-                onClick={this.onSearch}
-                disabled={!user || (!id.trim() && !name.trim())}
-              >
-                Search
-              </Button>
-              <Button
-                sx={{ m: .5 }}
-                variant='outlined'
-                onClick={this.onLast100Reports}
-                disabled={!user}
-              >
-                Last 100 Reports
-              </Button>
-              <Button
-                sx={{ m: .5 }}
-                variant='outlined'
-                onClick={this.onLast100RegionalReports}
-                disabled={!user}
-              >
-                Last 100 Regional Reports
-              </Button>
-              <Button
-                sx={{ m: .5 }}
-                variant='outlined'
-                onClick={this.onUserLast100Reports}
-                disabled={!user}
-              >
-                Your Last 100 Reports
-              </Button>
-            </Box>
-          </CardActions>
-        </Card>
+          </Stack>
+        </CardContent>
 
-        {results && <SearchResults title='Search Results' results={results} />}
-      </React.Fragment>
-    )
-  }
+        <CardActions>
+          <Stack direction={{ sm: 'column', md: 'row' }} spacing={1}>
+            <Button
+              variant='contained'
+              color='primary'
+              onClick={onSearch}
+              disabled={!user || !(clanId.trim() || clanName.trim())}
+            >
+              Search
+            </Button>
+
+            <Button
+              variant='outlined'
+              onClick={onLast100Reports}
+              disabled={!user}
+            >
+              Last 100 Reports
+            </Button>
+
+            <Button
+              variant='outlined'
+              onClick={onLast100RegionalReports}
+              disabled={!user}
+            >
+              Last 100 Regional Reports
+            </Button>
+
+            <Button
+              variant='outlined'
+              onClick={onUserLast100Reports}
+              disabled={!user}
+            >
+              Your Last 100 Reports
+            </Button>
+          </Stack>
+        </CardActions>
+      </Card>
+
+      {results && <SearchResults title='Search Results' results={results} />}
+    </>
+  )
 }
-
-
