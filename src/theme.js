@@ -5,7 +5,7 @@ export default createTheme({
   palette: {
     primary: {
       light: '#209CE0',
-      main: '#103346',
+      main: '##264557',
       dark: '#103346',
       contrastText: '#FFF',
     },

@@ -269,6 +269,7 @@ export default function NewReport({ user, onError, onOpenSnackbar }) {
                 placeholder={PLACEHOLDER_TEXT}
                 disabled={!user}
                 onChange={onParse}
+                value=''
               />
             </Stack>
           </Stack>
