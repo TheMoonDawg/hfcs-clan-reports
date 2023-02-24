@@ -4,8 +4,8 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Grid,
   MenuItem,
-  Stack,
   TextField,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
@@ -60,79 +60,96 @@ export default function Search({ user, onError }) {
         <CardHeader title='Search' />
 
         <CardContent>
-          <Stack direction='row' spacing={1}>
-            <TextField
-              type='number'
-              label='Clan ID'
-              disabled={!user}
-              value={clanId}
-              onChange={(e) => setClanId(e.target.value)}
-              sx={{ width: 200 }}
-            />
+          <Grid container spacing={1} rowSpacing={2}>
+            <Grid item xs={12} sm='auto'>
+              <TextField
+                type='number'
+                label='Clan ID'
+                disabled={!user}
+                value={clanId}
+                onChange={(e) => setClanId(e.target.value)}
+                sx={{ width: 200 }}
+              />
+            </Grid>
 
-            <TextField
-              type='number'
-              label='Clan Name'
-              disabled={!user}
-              value={clanName}
-              onChange={(e) => setClanName(e.target.value)}
-              sx={{ width: 300 }}
-            />
+            <Grid item xs={12} sm='auto'>
+              <TextField
+                type='number'
+                label='Clan Name'
+                disabled={!user}
+                value={clanName}
+                onChange={(e) => setClanName(e.target.value)}
+                sx={{ width: 300 }}
+              />
+            </Grid>
 
-            <TextField
-              select
-              label='Region'
-              disabled={!user}
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-              sx={{ width: 200 }}
-            >
-              <MenuItem value='English'>English</MenuItem>
-              <MenuItem value='French'>French</MenuItem>
-              <MenuItem value='German'>German</MenuItem>
-              <MenuItem value='Italian'>Italian</MenuItem>
-              <MenuItem value='Polish'>Polish</MenuItem>
-              <MenuItem value='Portuguese'>Portuguese</MenuItem>
-              <MenuItem value='Spanish'>Spanish</MenuItem>
-            </TextField>
-          </Stack>
+            <Grid item xs={12} sm='auto'>
+              <TextField
+                select
+                label='Region'
+                disabled={!user}
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+                sx={{ width: 200 }}
+              >
+                <MenuItem value='English'>English</MenuItem>
+                <MenuItem value='French'>French</MenuItem>
+                <MenuItem value='German'>German</MenuItem>
+                <MenuItem value='Italian'>Italian</MenuItem>
+                <MenuItem value='Polish'>Polish</MenuItem>
+                <MenuItem value='Portuguese'>Portuguese</MenuItem>
+                <MenuItem value='Spanish'>Spanish</MenuItem>
+              </TextField>
+            </Grid>
+          </Grid>
         </CardContent>
 
         <CardActions>
-          <Stack direction={{ sm: 'column', md: 'row' }} spacing={1}>
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={onSearch}
-              disabled={!user || !(clanId.trim() || clanName.trim())}
-            >
-              Search
-            </Button>
+          <Grid container spacing={1}>
+            <Grid item xs={12} sm='auto'>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={onSearch}
+                disabled={!user || !(clanId.trim() || clanName.trim())}
+              >
+                Search
+              </Button>
+            </Grid>
 
-            <Button
-              variant='outlined'
-              onClick={onLast100Reports}
-              disabled={!user}
-            >
-              Last 100 Reports
-            </Button>
+            <Grid item xs={12} sm='auto'>
+              <Button
+                variant='outlined'
+                color='inherit'
+                onClick={onLast100Reports}
+                disabled={!user}
+              >
+                Last 100 Reports
+              </Button>
+            </Grid>
 
-            <Button
-              variant='outlined'
-              onClick={onLast100RegionalReports}
-              disabled={!user}
-            >
-              Last 100 Regional Reports
-            </Button>
+            <Grid item xs={12} sm='auto'>
+              <Button
+                variant='outlined'
+                color='inherit'
+                onClick={onLast100RegionalReports}
+                disabled={!user}
+              >
+                Last 100 Regional Reports
+              </Button>
+            </Grid>
 
-            <Button
-              variant='outlined'
-              onClick={onUserLast100Reports}
-              disabled={!user}
-            >
-              Your Last 100 Reports
-            </Button>
-          </Stack>
+            <Grid item xs={12} sm='auto'>
+              <Button
+                variant='outlined'
+                color='inherit'
+                onClick={onUserLast100Reports}
+                disabled={!user}
+              >
+                Your Last 100 Reports
+              </Button>
+            </Grid>
+          </Grid>
         </CardActions>
       </Card>
 

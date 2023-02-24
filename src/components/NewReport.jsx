@@ -137,10 +137,19 @@ export default function NewReport({ user, onError, onOpenSnackbar }) {
         <CardHeader title={user?.name} />
 
         <CardContent>
-          <Stack direction='row' justifyContent='space-between'>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={3}
+            justifyContent='space-between'
+          >
             {/* Form */}
-            <Grid container columnSpacing={1} sx={{ width: 600 }}>
-              <Grid item xs={4}>
+            <Grid
+              container
+              columnSpacing={1}
+              rowSpacing={2}
+              sx={{ maxWidth: 600 }}
+            >
+              <Grid item xs={12} sm={4}>
                 <TextField
                   fullWidth
                   select
@@ -156,7 +165,7 @@ export default function NewReport({ user, onError, onOpenSnackbar }) {
                 </TextField>
               </Grid>
 
-              <Grid item xs={4}>
+              <Grid item xs={12} sm={4}>
                 <TextField
                   fullWidth
                   select
@@ -175,7 +184,7 @@ export default function NewReport({ user, onError, onOpenSnackbar }) {
                 </TextField>
               </Grid>
 
-              <Grid item xs={4}>
+              <Grid item xs={12} sm={4}>
                 <TextField
                   type='number'
                   fullWidth
@@ -215,7 +224,7 @@ export default function NewReport({ user, onError, onOpenSnackbar }) {
                 <TextField
                   fullWidth
                   multiline
-                  rowsMax={6}
+                  maxRows={6}
                   label='Clan Mission Statement:'
                   disabled={!user}
                   value={missionStatement}
@@ -227,7 +236,7 @@ export default function NewReport({ user, onError, onOpenSnackbar }) {
                 <TextField
                   fullWidth
                   multiline
-                  rowsMax={6}
+                  maxRows={6}
                   label='Notes:'
                   disabled={!user}
                   value={notes}

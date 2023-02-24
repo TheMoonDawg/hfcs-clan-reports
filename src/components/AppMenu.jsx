@@ -10,18 +10,20 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import background from '../images/background.jpg'
 
 export default function AppMenu({ user, drawerOpen, toggleDrawer }) {
-  // const width = useWidth()
-
   const [renderImage, setRenderImage] = useState(false)
 
+  const theme = useTheme()
+  const desktopMode = useMediaQuery(theme.breakpoints.up('sm'))
+
   const resources = user ? { __html: user.resources } : null
-  const desktopMode = true //isDesktop(width)
   const drawerVariant = desktopMode ? 'permanent' : 'temporary'
 
   return (
@@ -34,7 +36,7 @@ export default function AppMenu({ user, drawerOpen, toggleDrawer }) {
         width: 240,
       }}
     >
-      {desktopMode && <Box sx={(theme) => theme.mixins.toolbar} />}
+      <Box sx={(theme) => theme.mixins.toolbar} />
       <List>
         <ListItem
           component={Link}
@@ -72,21 +74,22 @@ export default function AppMenu({ user, drawerOpen, toggleDrawer }) {
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
+          pt: 1,
         }}
       >
-        {user && (
-          <Typography variant='headline' sx={{ ml: 1, mb: 3 }}>
+        {resources && (
+          <Typography variant='h5' color='text.secondary' sx={{ pl: 1, mb: 1 }}>
             Resources
           </Typography>
         )}
+
         <Box
           dangerouslySetInnerHTML={resources}
           sx={{
-            ml: 1,
+            pl: 1,
             '& > a': {
               display: 'block',
               color: 'common.white',
-              textDecoration: 'none',
               mb: 1,
             },
           }}

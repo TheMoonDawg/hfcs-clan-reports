@@ -1,13 +1,19 @@
 import { Menu } from '@mui/icons-material'
-import { AppBar, Box, IconButton, Toolbar, Typography } from '@mui/material'
-// import useWidth from "../hooks/useWidth"
-// import isDesktop from "../utils/isDesktop"
+import {
+  AppBar,
+  Box,
+  IconButton,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material'
 import AuthorizedUser from './AuthorizedUser'
 import LoggedOut from './LoggedOut'
 
 export default function AppToolbar({ user, toggleDrawer, onLogOut, onError }) {
-  // const width = useWidth()
-  const desktopMode = true //isDesktop(width)
+  const theme = useTheme()
+  const desktopMode = useMediaQuery(theme.breakpoints.up('sm'))
 
   return (
     <AppBar

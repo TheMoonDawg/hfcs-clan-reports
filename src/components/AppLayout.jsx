@@ -28,9 +28,7 @@ export default function AppLayout({ user, onLogOut, onError, children }) {
           flex: 1,
           backgroundColor: 'background.default',
           p: 2,
-          // minWidth: 0, // So the Typography noWrap works
           overflow: 'auto',
-          // height: '100%',
         }}
       >
         <Box sx={({ mixins }) => mixins.toolbar} />
