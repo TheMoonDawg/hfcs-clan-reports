@@ -1,7 +1,13 @@
 import { Snackbar as MUISnackbar } from '@mui/material'
 
-export default function Snackbar({ open, message, onClose }) {
-  const handleClose = (_e, reason) => {
+type Props = {
+  open: boolean
+  message: string
+  onClose: () => void
+}
+
+export default function Snackbar({ open, message, onClose }: Props) {
+  const handleClose = (_e: React.SyntheticEvent, reason: string) => {
     if (reason === 'timeout') {
       onClose()
     }

@@ -11,6 +11,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:prettier/recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
   overrides: [],
   parserOptions: {
@@ -18,7 +19,8 @@ module.exports = {
     sourceType: 'module',
     ecmaFeatures: { jsx: true },
   },
-  plugins: ['react', 'import'],
+  plugins: ['react', 'import', '@typescript-eslint'],
+  parser: '@typescript-eslint/parser',
   ignorePatterns: ['**/dist/*'],
   rules: {
     'no-unused-vars': ['error', { ignoreRestSiblings: true }],
@@ -29,7 +31,7 @@ module.exports = {
     'sort-imports': ['error', { ignoreDeclarationSort: true }],
     'react/prop-types': ['error', { skipUndeclared: true }],
     'react/jsx-curly-brace-presence': 'error',
-    'react/jsx-filename-extension': ['error', { allow: 'as-needed' }],
+    'react/jsx-filename-extension': ['error', { extensions: ['.tsx', '.jsx'] }],
     'react/display-name': 'off',
     'import/no-duplicates': ['error', { 'prefer-inline': true }],
     'import/no-commonjs': 'error',
